@@ -1,12 +1,13 @@
 import { Router } from "express";
 import controller from '../controllers/CalendarEntriesControllers'
+import verifyToken from '../middleware/verifyToken';
 
 const router = Router();
 
-router.post("/add", controller.register );
-router.post('/delete',controller.registerAdmin);
-router.post("/update",controller.login);
-router.post("/get", controller.logout)
-router.post("/getAll", controller.logout)
+router.post("/add", verifyToken, controller.add);
+router.delete('/delete', verifyToken, controller.delete);
+router.put("/update", verifyToken, controller.update);
+router.get("/get", verifyToken, controller.get)
+router.get("/getall", verifyToken, controller.getAll)
 
 module.exports = router;

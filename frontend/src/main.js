@@ -3,7 +3,7 @@ import App from './App.vue'
 import vuetify from './plugins/vuetify';
 import Axios from 'axios'
 import router from './router'
-import store from './store'
+import store from './store/store'
 
 Vue.prototype.$http = Axios;
 

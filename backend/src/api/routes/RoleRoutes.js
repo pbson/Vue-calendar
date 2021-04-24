@@ -3,6 +3,8 @@ import controller from '../controllers/RoleControllers'
 
 const router = Router();
 
-router.post("/get", controller.get)
+router.post("/add", controller.add)
+router.get("/get", controller.get)
+router.get("/getall", controller.getAll)
 
 module.exports = router;

@@ -1,7 +1,7 @@
 
 import Vue from 'vue'
 import Router from 'vue-router'
-import store from './store.js'
+import store from './store/store.js'
 import Home from './views/Home.vue'
 import About from './views/About.vue'
 import Login from './views/Login.vue'
@@ -12,6 +12,7 @@ import CalendarSettings from './views/CalendarSettings.vue'
 import UserSettings from './views/UserSettings.vue'
 import ChangePassword from './views/ChangePassword.vue'
 import CalendarSearch from './views/CalendarSearch.vue'
+import AppBar from './components/AppBar.vue'
 
 Vue.use(Router)
 
@@ -21,7 +22,10 @@ let router = new Router({
     {
       path:'/calendar',
       name:'calendar',
-      component: Calendar
+      components:{
+        default: Calendar,
+        header: AppBar
+      } 
     },
     {
       path:'/change-password',

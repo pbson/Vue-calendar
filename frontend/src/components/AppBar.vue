@@ -70,7 +70,6 @@ export default {
       });
     },
     setIsSidebarActive: function() {
-      console.log("abc");
       this.$store.commit(
         "setIsSidebarActive",
         !this.$store.state.isSidebarActive

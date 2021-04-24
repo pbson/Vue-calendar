@@ -1,11 +1,11 @@
 import { Router } from "express";
-import controller from '../controllers/ColorControllers'
+import controller from '../controllers/SubjectControllers'
 import verifyToken from '../middleware/verifyToken';
 
 const router = Router();
 
 router.post("/add",verifyToken, controller.add)
-router.get("/get",verifyToken, controller.get)
+router.put("/update",verifyToken, controller.update)
 router.get("/getall",verifyToken, controller.getAll)
 
 module.exports = router;

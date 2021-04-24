@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import timestamps from 'mongoose-timestamp';
 
+
 const baseCalendarsSchema = new Schema({
     Owner: { 
         type: Schema.Types.ObjectId, 
@@ -14,10 +15,7 @@ const baseCalendarsSchema = new Schema({
         type: String,
         required: true
     },
-    Events: { 
-        type: Array, 
-        required: true
-    }
+    Events: [{ type: Schema.Types.ObjectId, ref: 'events' }],
 })
 
 baseCalendarsSchema.plugin(timestamps);

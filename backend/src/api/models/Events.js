@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { timestamps } from 'mongoose-timestamp';
+import timestamps from 'mongoose-timestamp';
 
 const eventsSchema = new Schema({
     EventTitle: { 
@@ -7,6 +7,10 @@ const eventsSchema = new Schema({
         required: true
     },
     EventDescription: { 
+        type: String,
+        required: true
+    },
+    OnDay: { 
         type: String,
         required: true
     },
@@ -20,11 +24,6 @@ const eventsSchema = new Schema({
     },
     Duration: { 
         type: String,
-        required: true
-    },
-    IsAllDay: { 
-        type: Boolean,
-        required: true
     },
     IsRecurring: { 
         type: Boolean,
@@ -60,7 +59,12 @@ const eventsSchema = new Schema({
         ref: 'Colors',
         required: true
     },
+    BaseCalendarId: {
+        type: Schema.Types.ObjectId, 
+        ref: 'BaseCalendars',
+        required: true
+    },
 })
 
 eventsSchema.plugin(timestamps);
-export default model('CalendarEntries', eventsSchema)
+export default model('Events', eventsSchema)

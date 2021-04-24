@@ -1,6 +1,7 @@
 <template>
   <v-app id="app">
-    <AppBar/>
+    <router-view name="header">
+    </router-view>
     <v-main class="pt-2 pt-md-0">
       <v-container  fluid style="margin: 0px; padding: 0px; width: 100%" class="fill-height fluid">
         <router-view />
@@ -9,12 +10,8 @@
   </v-app>
 </template>
 <script>
-import AppBar from './components/AppBar.vue'
-
 export default {
-  components: {
-    'AppBar': AppBar
-  }
+
 };
 </script>
 
@@ -45,6 +42,7 @@ html {
   overflow: hidden !important;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  a { text-decoration: none; }
 }
 
 html::-webkit-scrollbar {

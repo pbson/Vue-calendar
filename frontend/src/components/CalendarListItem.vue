@@ -2,14 +2,14 @@
   <v-list dense>
     <v-list-item
       class="calendarListWrapper mt-0"
-      v-for="item in items"
-      :key="item.title"
+      v-for="item in calendarList"
+      :key="item.name"
     >
       <v-checkbox
-      class="ma-0"
+        class="ma-0"
         v-model="ex4"
-        label="What"
-        color="red"
+        :label="item.name"
+        :color="item.color"
         value="red"
         hide-details
       ></v-checkbox>
@@ -28,7 +28,7 @@
   justify-content: space-between;
   align-items: center;
 }
-.calendarSettings{
+.calendarSettings {
   margin-left: auto;
 }
 </style>
@@ -36,6 +36,9 @@
 <script>
 export default {
   computed: {},
+  props: {
+    calendarList: Object,
+  },
   data() {
     return {
       items: [

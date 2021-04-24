@@ -4,7 +4,13 @@
     <v-col class="pt-0">
       <v-sheet height="64">
         <v-toolbar flat>
-          <v-btn outlined class="mr-4" color="grey darken-2" @click="setToday">
+          <v-btn
+            rounded
+            outlined
+            class="mr-4"
+            color="grey darken-2"
+            @click="setToday"
+          >
             Today
           </v-btn>
           <v-btn fab text small color="grey darken-2" @click="prev">
@@ -61,7 +67,7 @@
           @click:event="showEvent"
           @click:more="viewDay"
           @click:date="viewDay"
-          @change="updateRange"
+          @change="refreshEvents"
           @mousedown:event="startDrag"
           @mousedown:time="startTime"
           @mousemove:time="mouseMove"
@@ -102,14 +108,14 @@
               </v-row>
               <v-row class="d-flex flex-row">
                 <v-col cols="1"> <v-icon>mdi-clock</v-icon> </v-col>
-                <v-col class="text-start"><p> Monday 2, 15/3/2021</p> </v-col>
+                <v-col class="text-start"><p>Monday 2, 15/3/2021</p> </v-col>
                 <v-col class="text-start"> Repeat everyday </v-col>
               </v-row>
               <v-row class="d-flex flex-row align-start justify-start">
                 <v-col cols="1"> <v-icon>mdi-account</v-icon> </v-col>
                 <v-col class="text-start"><p>Calendar 1</p></v-col>
               </v-row>
-                            <v-row class="d-flex flex-row align-start justify-start">
+              <v-row class="d-flex flex-row align-start justify-start">
                 <v-col cols="1"> <v-icon>mdi-account</v-icon> </v-col>
                 <v-col class="text-start"><p>Calendar description</p></v-col>
               </v-row>
@@ -128,6 +134,7 @@
 
 <script>
 import Sidebar from "../components/Sidebar";
+import { mapActions, mapMutations, mapGetters } from "vuex";
 
 export default {
   components: {
@@ -172,10 +179,19 @@ export default {
     createStart: null,
     extendOriginal: null,
   }),
+  computed: {
+    ...mapGetters(["getCalendarList"]),
+  },
   mounted() {
     this.$refs.calendar.checkChange();
   },
   methods: {
+    ...mapActions([
+      "addCalendarList", //also supports payload `this.nameOfAction(amount)`
+    ]),
+    ...mapMutations([
+      "nameOfAction", //also supports payload `this.nameOfAction(amount)`
+    ]),
     viewDay({ date }) {
       this.focus = date;
       this.type = "day";
@@ -234,6 +250,27 @@ export default {
       }
 
       this.events = events;
+    },
+    async refreshEvents() {
+      try {
+        await this.initInstances({
+          focus: this.focus,
+          name: this.getSelectedPerson.name,
+          type: this.getSelectedPerson.type,
+        });
+      } catch (e) {
+        this.updateSnackMessage(`Error loading ${e} `);
+      } finally {
+        this.events = this.getInstances(
+          this.focus,
+          this.getSelectedPerson.name,
+          this.getSelectedPerson.type
+        );
+
+        // // Clear props
+        // this.newDay = {};
+        // this.selectedEvent = {};
+      }
     },
     setToday() {
       this.focus = "";

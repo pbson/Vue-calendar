@@ -1,88 +1,89 @@
 <template>
-        <v-row align="center" justify="center">
-          <v-col cols="12" sm="8" md="8">
-            <v-card class="elevation-12">
-              <v-row class="fill-height">
-                <v-col cols="12" md="4" class="teal accent-3">
-                  <v-card-text class="dark--text mt-12">
-                    <h1 class="text-center display-1">Welcome Back!</h1>
-                    <h5 class="text-center">
-                      To Keep connected with us please login with your personnel
-                      info
-                    </h5>
-                  </v-card-text>
-                  <v-img
-                    src="../assets/Mobile login-bro.svg"
-                    max-width="500"
-                    max-height="300"
-                  >
-                    <template v-slot:placeholder>
-                      <v-row
-                        class="fill-height ma-0"
-                        align="center"
-                        justify="center"
-                      >
-                        <v-progress-circular
-                          indeterminate
-                          color="grey lighten-5"
-                        ></v-progress-circular>
-                      </v-row>
-                    </template>
-                  </v-img>
-                  <div class="text-center mt-12 mb-3">
-                    <v-btn rounded outlined light>Sign up</v-btn>
-                  </div>
-                </v-col>
-                <v-col cols="12" md="8">
-                  <v-card-text class="mt-12">
-                    <h1 class="text-center display-2 teal--text text--accent-3">
-                      Welcome back
-                    </h1>
-                    <h4 class="text-center mt-4">
-                      Login to your account
-                    </h4>
-                    <v-form
-                      ref="form"
-                      v-model="valid"
-                      lazy-validation
-                      @submit.prevent="login"
-                    >
-                      <v-text-field
-                        id="email"
-                        prepend-icon="email"
-                        v-model="email"
-                        :rules="emailRules"
-                        label="E-mail"
-                        required
-                      ></v-text-field>
+  <v-row class="fill-height">
+    <v-col
+      cols="12"
+      md="5"
+      class="d-flex flex-row sidepanel justify-center align-center"
+    >
+      <div class="sidepanel">
+        <h1 class="dark--text sidepanel__main-text">
+          Welcome back
+        </h1>
+        <h2 class="sidepanel__secondary-text">
+          Discover the world’s top Designers & Creatives.
+        </h2>
+        <v-img
+          src="../assets/vector-creator.png"
+          max-width="500"
+          max-height="500"
+        >
+          <template v-slot:placeholder>
+            <v-row class="fill-height ma-0" align="center" justify="center">
+              <v-progress-circular
+                indeterminate
+                color="grey lighten-5"
+              ></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
+        <div class="text-center mt-12 mb-3">
+          <router-link to="/register">
+            <v-btn rounded outlined>Register</v-btn>
+          </router-link>
+          <!-- <v-btn rounded outlined>Register</v-btn> -->
+        </div>
+      </div>
+    </v-col>
+    <v-col
+      cols="12"
+      md="7"
+      class="d-flex flex-column align-center justify-center"
+    >
+      <div class="main">
+        <h1 class="mb-10 text-center mt-4">
+          Sign in to SCal
+        </h1>
+        <v-form
+          ref="form"
+          v-model="valid"
+          lazy-validation
+          @submit.prevent="login()"
+        >
+          <v-text-field
+            id="email"
+            prepend-icon="email"
+            v-model="email"
+            label="E-mail"
+            filled
+            rounded
+            dense
+            required
+          ></v-text-field>
 
-                      <v-text-field
-                        type="password"
-                        id="password"
-                        prepend-icon="lock"
-                        :rules="passwordRules"
-                        v-model="password"
-                        label="Password"
-                        required
-                      ></v-text-field>
-                      <v-btn
-                        type="submit"
-                        :disabled="!valid"
-                        color="success"
-                        class="mr-4"
-                      >
-                        Submit
-                      </v-btn>
-                      <v-btn color="error" class="mr-4 red" @click="reset">
-                        Reset Form
-                      </v-btn>
-                    </v-form>
-                  </v-card-text>
-                </v-col>
-              </v-row>
-            </v-card>
-          </v-col>
-        </v-row>
+          <v-text-field
+            class="mt-5"
+            type="password"
+            id="password"
+            prepend-icon="lock"
+            v-model="password"
+            label="Password"
+            filled
+            rounded
+            dense
+            required
+          ></v-text-field>
+          <v-btn
+            class="main__submit-button mt-10"
+            elevation="0"
+            type="submit"
+            color="#059FFD"
+          >
+            Submit
+          </v-btn>
+        </v-form>
+      </div>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -99,7 +100,7 @@ export default {
       let password = this.password;
       this.$store
         .dispatch("login", { email, password })
-        .then(() => this.$router.push("/"))
+        .then(() => this.$router.push("/calendar"))
         .catch((err) => console.log(err));
     },
     validate() {
@@ -112,4 +113,27 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.sidepanel {
+  background-color: $color-blue-secondary !important;
+  .sidepanel__main-text {
+    font-size: 30px;
+  }
+  .sidepanel__secondary-text {
+    font-size: 20px;
+    font-weight: 100;
+  }
+}
+.main {
+  width: 700px;
+  align-items: center;
+  .main__submit-button {
+    color: white;
+    border-radius: 20px;
+    font-size: 16px;
+    padding: 16px;
+    width: 200px;
+    border: none;
+  }
+}
+</style>

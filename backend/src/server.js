@@ -33,9 +33,26 @@ db.on('error',error => console.log(error));
 db.on('open',() => console.log('Connected to mongoose'));
 
 //Import Routes
-import UserRouter from './api/routes/UserRoutes';
+import AccessRuleRouter from './api/routes/AccessRuleRoutes';
 import BaseCalendarRouter from './api/routes/BaseCalendarsRoutes';
+import CalendarEntriesRouter from './api/routes/CalendarEntriesRoutes';
+import ColorRouter from './api/routes/ColorRoutes';
+// import EventExceptionRouter from './api/routes/EventExceptionRoutes';
+import EventRouter from './api/routes/EventRoutes';
+import FacultyRouter from './api/routes/FacultyRoutes';
+import RoleRouter from './api/routes/RoleRoutes';
+import SubjectRouter from './api/routes/SubjectRoutes';
+import UserRouter from './api/routes/UserRoutes';
 
-app.use('/auth', UserRouter);
+app.use('/access-rule',AccessRuleRouter );
 app.use('/base-calendar', BaseCalendarRouter);
+app.use('/calendar-entries',CalendarEntriesRouter );
+app.use('/color', ColorRouter);
+// app.use('/event-exception',EventExceptionRouter );
+app.use('/event', EventRouter);
+app.use('/faculty', FacultyRouter);
+app.use('/role', RoleRouter);
+app.use('/subject', SubjectRouter);
+app.use('/auth', UserRouter);
+
 

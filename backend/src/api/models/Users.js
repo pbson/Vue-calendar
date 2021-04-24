@@ -32,7 +32,7 @@ const userSchema = new Schema({
         type: String,
         // required: true,
     },
-    CalendarLists:{ type: Schema.Types.ObjectId, ref: 'CalendarEntries' }
+    CalendarLists:[{ type: Schema.Types.ObjectId, ref: 'CalendarEntries' }]
 })
 userSchema.plugin(timestamps);
 

@@ -12,5 +12,5 @@ const facultiesSchema = new Schema({
     }
 })
 
-rolesSchema.plugin(timestamps);
+facultiesSchema.plugin(timestamps);
 export default model('Faculties', facultiesSchema)

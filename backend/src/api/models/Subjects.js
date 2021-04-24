@@ -9,7 +9,12 @@ const subjectsSchema = new Schema({
     SubjectCode: {
         type: String,
         required: true
-    }
+    },
+    FacultyId: { 
+        type: Schema.Types.ObjectId, 
+        ref: 'Faculties',
+        required: true
+    },
 })
 
 subjectsSchema.plugin(timestamps);

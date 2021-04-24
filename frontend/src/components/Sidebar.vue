@@ -3,13 +3,14 @@
     <v-col v-if="isSidebarActive" cols="2">
       <v-navigation-drawer class="drawerWrapper" v-model="isSidebarActive">
         <v-row class="buttonWrapper">
-          <AddEventDialog/>
+          <AddEventDialog />
         </v-row>
 
         <v-row class="calendarPickerWrapper" justify="center">
           <v-date-picker
             class="calendarPicker"
             v-model="picker"
+            color="#059FFD"
             header-color="#059FFD"
           >
           </v-date-picker>
@@ -17,10 +18,10 @@
 
         <v-row class="calendarListWrapper">
           <h1>Calendar list</h1>
-          <AddCalendarDialog/>
+          <AddCalendarDialog />
         </v-row>
-        <br>
-        <CalendarListItem/>
+        <br />
+        <CalendarListItem v-bind:calendarList="calendarList"/>
       </v-navigation-drawer>
     </v-col>
   </transition>
@@ -29,34 +30,36 @@
 <style scoped lang="scss">
 .drawerWrapper {
   width: 100% !important;
+  .buttonWrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 5px;
+  }
 }
-.buttonWrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: 5px;
-}
-.calendarPicker {
-  margin-top: 15px !important;
-}
+
 .calendarPickerWrapper {
   margin-top: 10px !important;
+  .calendarPicker {
+    margin-top: 15px !important;
+  }
 }
-.calendarListWrapper{
+.calendarListWrapper {
   display: flex;
   justify-content: space-around;
   align-items: center;
 }
-.addCalendarButton{
-  width: 40px;
-  height: 40px;
-  background-color: $color-blue-primary !important
+
+.v-picker__title {
+  color: $color-blue-primary !important;
+  background-color: white !important;
 }
+
 //Fade
 .slide-fade-enter-active {
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 .slide-fade-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 .slide-fade-enter, .slide-fade-leave-to
 /* .slide-fade-leave-active below version 2.1.8 */ {
@@ -66,20 +69,30 @@
 </style>
 
 <script>
-import AddEventDialog from '../components/AddEventDialog'
-import AddCalendarDialog from '../components/AddCalendarDialog'
-import CalendarListItem from '../components/CalendarListItem'
+import AddEventDialog from "../components/AddEventDialog";
+import AddCalendarDialog from "../components/AddCalendarDialog";
+import CalendarListItem from "../components/CalendarListItem";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   components: {
-    'AddEventDialog': AddEventDialog,
-    'AddCalendarDialog': AddCalendarDialog,
-    'CalendarListItem': CalendarListItem
+    AddEventDialog: AddEventDialog,
+    AddCalendarDialog: AddCalendarDialog,
+    CalendarListItem: CalendarListItem,
   },
   computed: {
+    ...mapGetters(["getCalendarList","getSidebarCalendarList"]),
     isSidebarActive() {
       return this.$store.state.isSidebarActive;
     },
+    calendarList(){
+      return this.getSidebarCalendarList
+    }
+  },
+  watch: {
+    calendarList(){
+      return this.getSidebarCalendarList
+    }
   },
   data() {
     return {
@@ -92,5 +105,13 @@ export default {
       ],
     };
   },
+  methods: {
+    ...mapActions(['addCalendarList']),
+  },
+  async created() {
+    if (!this.getCalendarList) {
+      await this.addCalendarList();
+    }
+  }
 };
 </script>

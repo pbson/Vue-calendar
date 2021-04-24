@@ -1,16 +1,18 @@
-import AccessRule from "../models/AccessRules";
+import Faculty from "../models/Faculties";
 
 export default {
     add: async function (req, res) {
         try {
-            let accessRule = new AccessRule();
-            accessRule.AccessName = req.body.accessName;
-            accessRule.save();
+            let faculty = new Faculty();
+            faculty.FacultyName = req.body.facultyName;
+            faculty.FacultyDescription = req.body.facultyDescription;
+            faculty.Subjects = [];
+            faculty.save();
             return res
                 .status(200)
                 .json({
                     status: 'OK',
-                    data: accessRule
+                    data: faculty
                 })
         } catch (error) {
             console.log(error)
@@ -21,28 +23,18 @@ export default {
                 })
         }
     },
-    get: async function (req, res) {
+    update: async function (req, res) {
         try {
-            let accessRule = null;
-            if (req.body.name){
-                accessRule = await AccessRule.findOne({ RoleName: req.body.name })
-            }else{
-                accessRule = await AccessRule.findById({ _id: req.body.id })
-            }
-            if (accessRule) {
-                return res
-                    .status(200)
-                    .json({
-                        status: 'OK',
-                        data: accessRule
-                    })
-            } else {
-                return res
-                    .status(404)
-                    .json({
-                        status: 'Not found',
-                    })
-            }
+            let faculty = await Faculty.findById({_id: req.body.id })
+            faculty.FacultyName = req.body.facultyName;
+            faculty.FacultyDescription = req.body.facultyDescription;
+            faculty.save();
+            return res
+                .status(200)
+                .json({
+                    status: 'OK',
+                    data: faculty
+                })
         } catch (error) {
             console.log(error)
             return res
@@ -54,13 +46,17 @@ export default {
     },
     getAll: async function (req, res) {
         try {
-            let accessRule = await AccessRule.find({})
-            if (accessRule) {
+            const page = parseInt(req.body.page)
+            const limit = parseInt(req.body.limit)
+
+            let faculty = await Faculty.find({}).populate('Subjects').sort({updatedAt: 1}).skip((page-1)*limit).limit(limit)
+
+            if (faculty) {
                 return res
                     .status(200)
                     .json({
                         status: 'OK',
-                        data: accessRule
+                        data: faculty
                     })
             } else {
                 return res
@@ -70,6 +66,7 @@ export default {
                     })
             }
         } catch (error) {
+            console.log(error)
             return res
                 .status(400)
                 .json({

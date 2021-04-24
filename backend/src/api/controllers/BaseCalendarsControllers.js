@@ -36,7 +36,8 @@ export default {
                 baseCalendar.CalendarDescription = req.body.description
                 baseCalendar.Events = []
                 baseCalendar.Owner = req.user._id
-                baseCalendar.save();
+                await baseCalendar.save();
+
                 return res
                     .status(200)
                     .json({
@@ -55,6 +56,7 @@ export default {
                 .status(400)
                 .json({
                     status: 'Bad request',
+                    data: error
                 })
         }
     },

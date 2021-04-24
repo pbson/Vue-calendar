@@ -7,16 +7,16 @@
       <br />
       <v-list dense>
         <v-list-item
-          v-for="[color,text] in items"
-          :key="text"
+          v-for="item in calendarList"
+          :key="item.id"
           link
         >
           <v-list-item-icon>
-            <v-icon :color=color >mdi-circle </v-icon>
+            <v-icon :color="item.color" >mdi-circle </v-icon>
           </v-list-item-icon>
 
           <v-list-item-content>
-            <v-list-item-title>{{ text }}</v-list-item-title>
+            <v-list-item-title>{{ item.name }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -44,16 +44,23 @@
 </style>
 
 <script>
+import { mapGetters,mapActions } from 'vuex';
+
 export default {
+  computed: {
+    ...mapGetters(["getSidebarCalendarList"]),
+  },
+  methods: {
+    ...mapActions(["addCalendarList"])
+  },
   data() {
     return {
-      items: [
-        ['red','Inbox'],
-        ['blue','Send'],
-        ['green', 'Trash'],
-        ['yellow','Spam'],
-      ],
+      calendarList: []
     };
   },
+  async created () {
+    await this.addCalendarList()
+    this.calendarList = this.getSidebarCalendarList
+  }
 };
 </script>

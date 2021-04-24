@@ -25,7 +25,8 @@ export default {
             const user = new User({
                 Name: name,
                 Email: email,
-                Password: hashPassword
+                Password: hashPassword,
+                CalendarLists: []
             });
 
             const savedUser = await user.save();
@@ -96,5 +97,55 @@ export default {
         } catch {
             res.status(400).send(error);
         }
-    }
+    },
+    update: async function (req, res) {
+        try {
+            if (!isId(req.body.facultyId) || !isId(req.body.id)) {
+                return res
+                    .status(404)
+                    .json({
+                        status: 'Not found',
+                    })
+            }
+            let faculty = await Faculty.findOne({ _id: req.body.facultyId })
+            let subject = await Subject.findById({ _id: req.body.id })
+            if (!faculty) {
+                return res
+                    .status(404)
+                    .json({
+                        status: 'Not found',
+                        msg: 'Faculty not found'
+                    })
+            } if (!subject) {
+                return res
+                    .status(404)
+                    .json({
+                        status: 'Not found',
+                        msg: 'Subject not found'
+                    })
+            } else {
+                subject.SubjectName = req.body.subjectName;
+                subject.SubjectCode = req.body.subjectCode;
+                subject.FacultyId = req.body.facultyId;
+                subject.save();
+
+                faculty.Subjects.push(subject._id)
+                faculty.save();
+
+                return res
+                    .status(200)
+                    .json({
+                        status: 'OK',
+                        data: subject
+                    })
+            }
+        } catch (error) {
+            console.log(error)
+            return res
+                .status(400)
+                .json({
+                    status: 'Bad request',
+                })
+        }
+    },
 }

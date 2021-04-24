@@ -1,26 +1,28 @@
 import { Schema, model } from 'mongoose';
-import { timestamps } from 'mongoose-timestamp';
+import timestamps  from 'mongoose-timestamp';
+import BaseCalendars from './BaseCalendars'
+import AccessRules from './AccessRules'
+import Colors from './Colors'
+
 
 const calendarEntriesSchema = new Schema({
     CalendarId: { 
         type: Schema.Types.ObjectId, 
-        ref: 'BaseCalendars',
+        ref: BaseCalendars,
         required: true
     },
     AccessRuleId:{
         type: Schema.Types.ObjectId, 
-        ref: 'AccessRuleId',
+        ref: AccessRules,
         required: true
     },
     ColorId:{
         type: Schema.Types.ObjectId, 
-        ref: 'Colors',
+        ref: Colors,
         required: true
     },
     Reminders: { 
-        minutes:{
-            type: String
-        },
+        type: String
     },
     isHidden: { 
         type: Boolean, 
