@@ -5,7 +5,7 @@
       md="5"
       class="d-flex flex-row sidepanel justify-center align-center"
     >
-      <div class="sidepanel">
+      <div class="sidepanel text-center">
         <h1 class="dark--text sidepanel__main-text">
           Welcome back
         </h1>
@@ -48,6 +48,7 @@
           v-model="valid"
           lazy-validation
           @submit.prevent="login()"
+          class="text-center"
         >
           <v-text-field
             id="email"

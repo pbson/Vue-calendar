@@ -1,70 +1,78 @@
 import { Schema, model } from 'mongoose';
 import timestamps from 'mongoose-timestamp';
+import Users from './Users'
+import AccessRules from './AccessRules'
 
 const eventsSchema = new Schema({
-    EventTitle: { 
+    EventTitle: {
         type: String,
         required: true
     },
-    EventDescription: { 
+    EventDescription: {
         type: String,
         required: true
     },
-    OnDay: { 
+    OnDay: {
         type: String,
         required: true
     },
-    StartAt: { 
+    StartAt: {
         type: String,
         required: true
     },
-    EndAt: { 
-        type: String,
-        required: true
-    },
-    Duration: { 
+    EndAt: {
         type: String,
     },
-    IsRecurring: { 
+    Duration: {
+        type: String,
+    },
+    IsRecurring: {
         type: Boolean,
-        required: true
     },
-    RecurrencePattern: { 
+    RecurrencePattern: {
         type: String,
     },
-    Owner:{
-        type: Schema.Types.ObjectId, 
-        ref: 'Users',
+    Owner: {
+        type: Schema.Types.ObjectId,
+        ref: Users,
         required: true
     },
-    ResponseStatus: { 
+    ResponseStatus: {
         type: String,
-        required: true
     },
-    Attendees: { 
-        UserId:{
-            type: Schema.Types.ObjectId,
-            ref: 'Users',
-        },
-        AccessRuleId:{
-            type: Schema.Types.ObjectId,
-            ref: 'AccessRules',
-        },
-        ResponseStatus:{
-            type: String,
-        },
-    },
-    ColorId:{
-        type: Schema.Types.ObjectId, 
+    Attendees: [
+        {
+            UserId: {
+                type: Schema.Types.ObjectId,
+                ref: Users,
+            },
+            AccessRuleId: {
+                type: Schema.Types.ObjectId,
+                ref: AccessRules,
+            },
+            ResponseStatus: {
+                type: String,
+            },
+        }
+    ],
+    ColorId: {
+        type: Schema.Types.ObjectId,
         ref: 'Colors',
         required: true
     },
     BaseCalendarId: {
-        type: Schema.Types.ObjectId, 
+        type: Schema.Types.ObjectId,
         ref: 'BaseCalendars',
         required: true
     },
+    IsComplete: {
+        type: Boolean,
+    },
+    Type: {
+        type: String,
+    }
 })
 
 eventsSchema.plugin(timestamps);
+eventsSchema.index({ Owner: 1 });
 export default model('Events', eventsSchema)

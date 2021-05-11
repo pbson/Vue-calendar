@@ -24,13 +24,11 @@
       </div>
     </v-col>
 
-    <v-col lg="6" class="pt-0">
+    <v-col lg="6" class="pt-0 mt-11">
       <v-sheet height="64">
-        <h2>Settings for calendar</h2>
         <div>
           <v-container>
             <v-row class="d-flex flex-column">
-              <b></b>
               <v-row>
                 <h2>Calendar information</h2>
                 <v-col cols="12">
@@ -63,8 +61,7 @@
               </v-row>
 
               <v-row class="d-flex flex-column">
-                <h2 class="align-self-start">Share your calendar</h2>
-                <v-row>
+                <v-row class="pl-2">
                   <v-col cols="6">
                     <v-select
                       prepend-icon="mdi-share"
@@ -88,7 +85,7 @@
                   </v-col>
                 </v-row>
               </v-row>
-
+              <!-- 
               <v-row class="justify-start flex-column mb-4">
                 <h2 class="align-self-start">Access Rights</h2>
                 <v-row class="ml-1">
@@ -120,45 +117,15 @@
                     </v-icon>
                   </v-btn>
                 </v-row>
-              </v-row>
-
-              <v-row class="justify-start flex-column">
-                <h2 class="align-self-start">Notifications before</h2>
-                <v-row class="pa-3">
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      prepend-icon="mdi-alarm"
-                      single-line
-                      v-model="time"
-                      type="number"
-                      label="30"
-                      required
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      prepend-icon="mdi-alarm"
-                      single-line
-                      type="number"
-                      label="Minute"
-                      disabled
-                      required
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-row>
-              {{ isPrimary }}
+              </v-row> -->
               <v-row class="mt-5 justify-start flex-column" v-show="!isPrimary">
                 <h2 class="align-self-start">Delete Calendar</h2>
                 <p class="align-self-start">
-                  Notice: All your calendar will be deleted and can't be
-                  recovered
+                  Notice: All your calendar will be deleted and can't be recovered
                 </p>
                 <v-btn color="red" class="ma-2 white--text align-self-start">
                   Delete
-                  <v-icon right dark>
-                    mdi-trash-can
-                  </v-icon>
+                  <v-icon right dark> mdi-trash-can </v-icon>
                 </v-btn>
               </v-row>
             </v-row>
@@ -169,7 +136,6 @@
     <v-card-text>
       <v-fab-transition>
         <v-btn
-          v-show="!hidden"
           @click="updateCalendar"
           color="primary"
           class="floatingButton"
@@ -185,7 +151,6 @@
     <v-card-text>
       <v-fab-transition>
         <v-btn
-          v-show="!hidden"
           color="primary"
           class="floatingButton"
           dark
@@ -195,9 +160,7 @@
           @click="updateCalendar"
         >
           Save changes
-          <v-icon right dark>
-            mdi-content-save
-          </v-icon>
+          <v-icon right dark> mdi-content-save </v-icon>
         </v-btn>
       </v-fab-transition>
     </v-card-text>
@@ -220,7 +183,6 @@ export default {
       selectColor: null,
       selectRule: null,
       selectPrivacy: null,
-      time: null,
       isPrimary: null,
     };
   },
@@ -239,7 +201,7 @@ export default {
             "auth-token": token,
           },
         });
-        return resp.data.data.map(function(elem) {
+        return resp.data.data.map(function (elem) {
           let obj = {};
           obj["id"] = elem._id;
           obj["name"] = elem.CalendarMain;
@@ -259,7 +221,7 @@ export default {
             "auth-token": token,
           },
         });
-        return resp.data.data.map(function(elem) {
+        return resp.data.data.map(function (elem) {
           let obj = {};
           obj["id"] = elem._id;
           obj["name"] = elem.AccessName;
@@ -269,7 +231,7 @@ export default {
         console.log(error);
       }
     },
-    getCalendar: async function(calendarId) {
+    getCalendar: async function (calendarId) {
       const token = localStorage.getItem("token");
       try {
         let resp = await axios({
@@ -285,23 +247,23 @@ export default {
         this.title = resp.data.data.CalendarId.CalendarTitle;
         this.description = resp.data.data.CalendarId.CalendarDescription;
         this.selectColor = resp.data.data.ColorId._id;
-        this.selectRule = resp.data.data.AccessRuleId._id;
-        this.selectPrivacy = resp.data.data.isHidden ? "Private" : "Public";
-        this.time = resp.data.data.Reminders;
+        this.selectRule = resp.data.data.CalendarId.AccessRuleId;
+        this.selectPrivacy = resp.data.data.CalendarId.isHidden ? "Private" : "Public";
         this.isPrimary = resp.data.data.isPrimary;
-
         // console.log(this.baseCalendarId, this.calendarId)
       } catch (error) {
         console.log(error);
       }
     },
-    updateCalendar: async function (){
+    updateCalendar: async function () {
       try {
         const token = localStorage.getItem("token");
         let baseCalendar = {
           id: this.baseCalendarId,
           title: this.title,
           description: this.description,
+          accessRuleId: this.selectRule,
+          isHidden: this.selectPrivacy == "Public" ? false : true,
         };
         await axios({
           url: "http://localhost:3000/base-calendar/update",
@@ -313,10 +275,8 @@ export default {
         });
         let calendarEntries = {
           id: this.calendarId,
-          accessRuleId: this.selectRule,
           colorId: this.selectColor,
           time: this.time,
-          isHidden: this.selectPrivacy == 'Public' ? false : true,
         };
         await axios({
           url: "http://localhost:3000/calendar-entries/update",
@@ -329,7 +289,7 @@ export default {
       } catch (error) {
         console.log(error);
       }
-    }
+    },
   },
   async created() {
     this.color = await this.getColor();

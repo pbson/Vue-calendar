@@ -1,6 +1,9 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
 import { registerValidation, loginValidation } from '../../../validation';
+import Event from "../models/Events";
+
 
 import User from "../models/Users";
 
@@ -139,6 +142,759 @@ export default {
                         data: subject
                     })
             }
+        } catch (error) {
+            console.log(error)
+            return res
+                .status(400)
+                .json({
+                    status: 'Bad request',
+                })
+        }
+    },
+    search: async function (req, res) {
+        try {
+            if (req.query.user) {
+                let user = await User.find({ $text: { $search: req.query.user } })
+                return res
+                    .status(200)
+                    .json({
+                        data: user,
+                        status: 'OK'
+                    })
+            }
+        } catch (error) {
+            console.log(error)
+            return res
+                .status(400)
+                .json({
+                    status: 'Bad request',
+                })
+        }
+    },
+    sendInvitation: async function (req, res) {
+        try {
+            //GET INFO
+            let sender = await User.findById(req.user._id);
+            let event = await Event.findById(req.body.eventId);
+
+            // create reusable transporter object using the default SMTP transport
+            let transporter = nodemailer.createTransport({
+                host: "smtp.gmail.com",
+                port: 465,
+                secure: true, // true for 465, false for other ports
+                auth: {
+                    user: 'nguyenanh4179@gmail.com',
+                    pass: 'NtldtntSC',
+                },
+            });
+            await Promise.all(
+                req.body.users.map(async (item) => {
+                    let email = await User.findById(item).select('Email')
+                    let content = ''
+                    content +=  ` <!DOCTYPE html>
+                    <html
+                      xmlns="http://www.w3.org/1999/xhtml"
+                      xmlns:v="urn:schemas-microsoft-com:vml"
+                      xmlns:o="urn:schemas-microsoft-com:office:office"
+                    >
+                      <head>
+                        <title> </title>
+                        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1" />
+                        <style type="text/css">
+                          #outlook a {
+                            padding: 0;
+                          }
+                    
+                          body {
+                            margin: 0;
+                            padding: 0;
+                            -webkit-text-size-adjust: 100%;
+                            -ms-text-size-adjust: 100%;
+                          }
+                    
+                          table,
+                          td {
+                            border-collapse: collapse;
+                            mso-table-lspace: 0pt;
+                            mso-table-rspace: 0pt;
+                          }
+                    
+                          img {
+                            border: 0;
+                            height: auto;
+                            line-height: 100%;
+                            outline: none;
+                            text-decoration: none;
+                            -ms-interpolation-mode: bicubic;
+                          }
+                    
+                          p {
+                            display: block;
+                            margin: 13px 0;
+                          }
+                        </style>
+                        <style type="text/css">
+                          @media only screen and (min-width: 480px) {
+                            .mj-column-per-100 {
+                              width: 100% !important;
+                              max-width: 100%;
+                            }
+                    
+                            .mj-column-per-50 {
+                              width: 50% !important;
+                              max-width: 50%;
+                            }
+                          }
+                        </style>
+                        <style type="text/css"></style>
+                      </head>
+                    
+                      <body style="background-color: #e7e7e7">
+                        <div style="background-color: #e7e7e7">
+                          <div
+                            style="
+                              background: #1f2e78;
+                              background-color: #1f2e78;
+                              margin: 0px auto;
+                              max-width: 600px;
+                            "
+                          >
+                            <table
+                              align="center"
+                              border="0"
+                              cellpadding="0"
+                              cellspacing="0"
+                              role="presentation"
+                              style="background: #1f2e78; background-color: #1f2e78; width: 100%"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td
+                                    style="
+                                      direction: ltr;
+                                      font-size: 0px;
+                                      padding: 20px 0;
+                                      text-align: center;
+                                    "
+                                  >
+                                    <div
+                                      class="mj-column-per-100 mj-outlook-group-fix"
+                                    >
+                                      <table
+                                        border="0"
+                                        cellpadding="0"
+                                        cellspacing="0"
+                                        role="presentation"
+                                        style="vertical-align: top"
+                                        width="100%"
+                                      >
+                                        <tr>
+                                          <td
+                                            align="center"
+                                          >
+                                            <div
+                                              style="
+                                                font-size: 24px;
+                                                font-weight: bold;
+                                                letter-spacing: 1px;
+                                                line-height: 50px;
+                                                color: #17cbc4;
+                                              "
+                                            >
+                                              Invitation email
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class="body-section">
+                            <table
+                              align="center"
+                              border="0"
+                              cellpadding="0"
+                              cellspacing="0"
+                              role="presentation"
+                              style="width: 100%"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td
+                                  >
+                                    <div
+                                      style="
+                                        margin: 0px auto;
+                                        max-width: 600px;
+                                      "
+                                    >
+                                      <table
+                                        align="center"
+                                        border="0"
+                                        cellpadding="0"
+                                        cellspacing="0"
+                                        role="presentation"
+                                        style="
+                                          background: #ffffff;
+                                          background-color: #ffffff;
+                                          width: 100%;
+                                        "
+                                      >
+                                        <tbody>
+                                          <tr>
+                                            <td
+                                              style="
+                                                direction: ltr;
+                                                font-size: 0px;
+                                                padding: 20px 0;
+                                                padding-left: 15px;
+                                                padding-right: 15px;
+                                                text-align: center;
+                                              "
+                                            >
+                                              <div
+                                                class="mj-column-per-100 mj-outlook-group-fix"
+                                                style="
+                                                  font-size: 0px;
+                                                  text-align: left;
+                                                  direction: ltr;
+                                                  display: inline-block;
+                                                  vertical-align: top;
+                                                  width: 100%;
+                                                "
+                                              >
+                                                <table
+                                                  border="0"
+                                                  cellpadding="0"
+                                                  cellspacing="0"
+                                                  role="presentation"
+                                                  style="vertical-align: top"
+                                                  width="100%"
+                                                >
+                                                  <tr>
+                                                    <td
+                                                      align="left"
+                                                      style="
+                                                        font-size: 0px;
+                                                        padding: 10px 25px;
+                                                        word-break: break-word;
+                                                      "
+                                                    >
+                                                      <div
+                                                        style="
+                                                          font-family: 'Helvetica Neue', Helvetica,
+                                                            Arial, sans-serif;
+                                                          font-size: 20px;
+                                                          font-weight: bold;
+                                                          line-height: 24px;
+                                                          text-align: left;
+                                                          color: #212b35;
+                                                        "
+                                                      >
+                                                        ${req.body.subject}
+                                                      </div>
+                                                    </td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td
+                                                      align="left"
+                                                      style="
+                                                        font-size: 0px;
+                                                        padding: 10px 25px;
+                                                        word-break: break-word;
+                                                      "
+                                                    >
+                                                    </td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td
+                                                      align="left"
+                                                      style="
+                                                        font-size: 0px;
+                                                        padding: 10px 25px;
+                                                        word-break: break-word;
+                                                      "
+                                                    >
+                                                      <div
+                                                        style="
+                                                          font-family: 'Helvetica Neue', Helvetica,
+                                                            Arial, sans-serif;
+                                                          font-size: 16px;
+                                                          font-weight: 400;
+                                                          line-height: 24px;
+                                                          text-align: left;
+                                                          color: #637381;
+                                                        "
+                                                      >
+                                                        You have receive a event invitation from
+                                                        ${sender.Name}. The details is down below. You could choose to accept or deny the event
+                                                      </div>
+                                                    </td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td
+                                                      align="center"
+                                                      vertical-align="middle"
+                                                      style="
+                                                        font-size: 0px;
+                                                        padding: 10px 25px;
+                                                        word-break: break-word;
+                                                      "
+                                                    >
+                                                      <table
+                                                        border="0"
+                                                        cellpadding="0"
+                                                        cellspacing="0"
+                                                        role="presentation"
+                                                        style="
+                                                          border-collapse: separate;
+                                                          width: 300px;
+                                                          line-height: 100%;
+                                                        "
+                                                      >
+                                                        <tr>
+                                                          <td
+                                                            align="center"
+                                                            bgcolor="#5e6ebf"
+                                                            role="presentation"
+                                                            style="
+                                                              border: none;
+                                                              border-radius: 3px;
+                                                              cursor: auto;
+                                                              mso-padding-alt: 10px 25px;
+                                                              background: #5e6ebf;
+                                                            "
+                                                            valign="middle"
+                                                          >
+                                                            <a
+                                                              href="http://localhost:3000/event/invite-reply?eventId=${event._id}&receiver=${email._id}&ans=1&sender=${sender._id}&rule=${req.body.rule}"
+                                                              target="_blank"
+                                                              style="
+                                                                display: inline-block;
+                                                                width: 250px;
+                                                                background: #5e6ebf;
+                                                                color: #ffffff;
+                                                                font-family: 'Helvetica Neue',
+                                                                  Helvetica, Arial, sans-serif;
+                                                                font-size: 17px;
+                                                                font-weight: bold;
+                                                                line-height: 120%;
+                                                                margin: 0;
+                                                                text-decoration: none;
+                                                                text-transform: none;
+                                                                padding: 10px 25px;
+                                                                mso-padding-alt: 0px;
+                                                                border-radius: 3px;
+                                                              "
+                                                              target="_blank"
+                                                            >
+                                                              Accept
+                                                            </a>
+                                                          </td>
+                                                        </tr>
+                                                      </table>
+                                                    </td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td
+                                                      align="center"
+                                                      vertical-align="middle"
+                                                      style="
+                                                        font-size: 0px;
+                                                        padding: 10px 25px;
+                                                        word-break: break-word;
+                                                      "
+                                                    >
+                                                      <table
+                                                        border="0"
+                                                        cellpadding="0"
+                                                        cellspacing="0"
+                                                        role="presentation"
+                                                        style="
+                                                          border-collapse: separate;
+                                                          width: 300px;
+                                                          line-height: 100%;
+                                                        "
+                                                      >
+                                                        <tr>
+                                                          <td
+                                                            align="center"
+                                                            bgcolor="#5e6ebf"
+                                                            role="presentation"
+                                                            style="
+                                                              border: none;
+                                                              border-radius: 3px;
+                                                              cursor: auto;
+                                                              mso-padding-alt: 10px 25px;
+                                                              background: #5e6ebf;
+                                                            "
+                                                            valign="middle"
+                                                          >
+                                                            <a
+                                                              href="http://localhost:3000/event/invite-reply?eventId=${event._id}&receiver=${email._id}&ans=0&sender=${sender._id}&rule=${req.body.rule}"
+                                                              target="_blank"
+                                                              style="
+                                                                display: inline-block;
+                                                                width: 250px;
+                                                                background: #5e6ebf;
+                                                                color: #ffffff;
+                                                                font-family: 'Helvetica Neue',
+                                                                  Helvetica, Arial, sans-serif;
+                                                                font-size: 17px;
+                                                                font-weight: bold;
+                                                                line-height: 120%;
+                                                                margin: 0;
+                                                                text-decoration: none;
+                                                                text-transform: none;
+                                                                padding: 10px 25px;
+                                                                mso-padding-alt: 0px;
+                                                                border-radius: 3px;
+                                                              "
+                                                              target="_blank"
+                                                            >
+                                                              Denied
+                                                            </a>
+                                                          </td>
+                                                        </tr>
+                                                      </table>
+                                                    </td>
+                                                  </tr>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                    <div
+                                      style="
+                                        background: #ffffff;
+                                        background-color: #ffffff;
+                                        margin: 0px auto;
+                                        max-width: 600px;
+                                      "
+                                    >
+                                      <table
+                                        align="center"
+                                        border="0"
+                                        cellpadding="0"
+                                        cellspacing="0"
+                                        role="presentation"
+                                        style="
+                                          background: #ffffff;
+                                          background-color: #ffffff;
+                                          width: 100%;
+                                        "
+                                      >
+                                        <tbody>
+                                          <tr>
+                                            <td
+                                              style="
+                                                direction: ltr;
+                                                font-size: 0px;
+                                                padding: 20px 0;
+                                                padding-left: 15px;
+                                                padding-right: 15px;
+                                                padding-top: 0;
+                                                text-align: center;
+                                              "
+                                            >
+                                              <div
+                                                class="mj-column-per-100 mj-outlook-group-fix"
+                                                style="
+                                                  font-size: 0px;
+                                                  text-align: left;
+                                                  direction: ltr;
+                                                  display: inline-block;
+                                                  vertical-align: top;
+                                                  width: 100%;
+                                                "
+                                              >
+                                                <table
+                                                  border="0"
+                                                  cellpadding="0"
+                                                  cellspacing="0"
+                                                  role="presentation"
+                                                  style="vertical-align: top"
+                                                  width="100%"
+                                                >
+                                                  <tr>
+                                                    <td
+                                                      style="
+                                                        font-size: 0px;
+                                                        padding: 10px 25px;
+                                                        word-break: break-word;
+                                                      "
+                                                    >
+                                                      <p
+                                                        style="
+                                                          border-top: solid 1px #dfe3e8;
+                                                          font-size: 1px;
+                                                          margin: 0px auto;
+                                                          width: 100%;
+                                                        "
+                                                      ></p>
+                                                    </td>
+                                                  </tr>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                    <div
+                                      style="
+                                        background: #ffffff;
+                                        background-color: #ffffff;
+                                        margin: 0px auto;
+                                        max-width: 600px;
+                                      "
+                                    >
+                                      <table
+                                        align="center"
+                                        border="0"
+                                        cellpadding="0"
+                                        cellspacing="0"
+                                        role="presentation"
+                                        style="
+                                          background: #ffffff;
+                                          background-color: #ffffff;
+                                          width: 100%;
+                                        "
+                                      >
+                                        <tbody>
+                                          <tr>
+                                            <td
+                                              style="
+                                                direction: ltr;
+                                                font-size: 0px;
+                                                padding: 0 15px 0 15px;
+                                                text-align: center;
+                                              "
+                                            >
+                                              <div
+                                                class="mj-column-per-100 mj-outlook-group-fix"
+                                                style="
+                                                  font-size: 0px;
+                                                  text-align: left;
+                                                  direction: ltr;
+                                                  display: inline-block;
+                                                  vertical-align: top;
+                                                  width: 100%;
+                                                "
+                                              ></div>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                    <div
+                                      style="
+                                        background: #ffffff;
+                                        background-color: #ffffff;
+                                        margin: 0px auto;
+                                        max-width: 600px;
+                                      "
+                                    >
+                                      <table
+                                        align="center"
+                                        border="0"
+                                        cellpadding="0"
+                                        cellspacing="0"
+                                        role="presentation"
+                                        style="
+                                          background: #ffffff;
+                                          background-color: #ffffff;
+                                          width: 100%;
+                                        "
+                                      >
+                                        <tbody>
+                                          <tr>
+                                            <td
+                                              style="
+                                                direction: ltr;
+                                                font-size: 0px;
+                                                padding: 20px 0;
+                                                padding-left: 15px;
+                                                padding-right: 15px;
+                                                text-align: center;
+                                              "
+                                            >
+                                              <div
+                                                class="mj-column-per-50 mj-outlook-group-fix"
+                                                style="
+                                                  font-size: 0px;
+                                                  text-align: left;
+                                                  direction: ltr;
+                                                  display: inline-block;
+                                                  vertical-align: top;
+                                                  width: 100%;
+                                                "
+                                              >
+                                                <table
+                                                  border="0"
+                                                  cellpadding="0"
+                                                  cellspacing="0"
+                                                  role="presentation"
+                                                  style="vertical-align: top"
+                                                  width="100%"
+                                                >
+                                                  <tr>
+                                                    <td
+                                                      align="left"
+                                                      style="
+                                                        font-size: 0px;
+                                                        padding: 10px 25px;
+                                                        padding-bottom: 0;
+                                                        word-break: break-word;
+                                                      "
+                                                    >
+                                                      <div
+                                                        style="
+                                                          font-family: 'Helvetica Neue', Helvetica,
+                                                            Arial, sans-serif;
+                                                          font-size: 12px;
+                                                          font-weight: bold;
+                                                          line-height: 24px;
+                                                          text-align: left;
+                                                          text-transform: uppercase;
+                                                          color: #212b35;
+                                                        "
+                                                      >
+                                                        ${event.EventTitle}
+                                                      </div>
+                                                    </td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td
+                                                      align="left"
+                                                      style="
+                                                        font-size: 0px;
+                                                        padding: 10px 25px;
+                                                        padding-top: 0;
+                                                        word-break: break-word;
+                                                      "
+                                                    >
+                                                      <div
+                                                        style="
+                                                          font-family: 'Helvetica Neue', Helvetica,
+                                                            Arial, sans-serif;
+                                                          font-size: 14px;
+                                                          font-weight: 400;
+                                                          line-height: 24px;
+                                                          text-align: left;
+                                                          color: #637381;
+                                                        "
+                                                      >
+                                                      ${event.EventDescription}
+                                                      </div>
+                                                    </td>
+                                                  </tr>
+                                                </table>
+                                              </div>
+                                              <div
+                                                class="mj-column-per-50 mj-outlook-group-fix"
+                                                style="
+                                                  font-size: 0px;
+                                                  text-align: left;
+                                                  direction: ltr;
+                                                  display: inline-block;
+                                                  vertical-align: top;
+                                                  width: 100%;
+                                                "
+                                              >
+                                                <table
+                                                  border="0"
+                                                  cellpadding="0"
+                                                  cellspacing="0"
+                                                  role="presentation"
+                                                  style="vertical-align: top"
+                                                  width="100%"
+                                                >
+                                                  <tr>
+                                                    <td
+                                                      align="left"
+                                                      style="
+                                                        font-size: 0px;
+                                                        padding: 10px 25px;
+                                                        padding-bottom: 0;
+                                                        word-break: break-word;
+                                                      "
+                                                    >
+                                                      <div
+                                                        style="
+                                                          font-family: 'Helvetica Neue', Helvetica,
+                                                            Arial, sans-serif;
+                                                          font-size: 12px;
+                                                          font-weight: bold;
+                                                          line-height: 24px;
+                                                          text-align: left;
+                                                          text-transform: uppercase;
+                                                          color: #212b35;
+                                                        "
+                                                      >
+                                                        Event time
+                                                      </div>
+                                                    </td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td
+                                                      align="left"
+                                                      style="
+                                                        font-size: 0px;
+                                                        padding: 10px 25px;
+                                                        padding-top: 0;
+                                                        word-break: break-word;
+                                                      "
+                                                    >
+                                                      <div
+                                                        style="
+                                                          font-family: 'Helvetica Neue', Helvetica,
+                                                            Arial, sans-serif;
+                                                          font-size: 14px;
+                                                          font-weight: 400;
+                                                          line-height: 24px;
+                                                          text-align: left;
+                                                          color: #637381;
+                                                        "
+                                                      >
+                                                        ${event.OnDay} ${event.StartAt} to
+                                                        <br />
+                                                        ${event.OnDay} ${event.EndAt}
+                                                      </div>
+                                                    </td>
+                                                  </tr>
+                                                </table>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </body>
+                    </html>
+                    
+                    `
+                    await transporter.sendMail({
+                        from: `${sender.Name} <${sender.Email}>`, // sender address
+                        to: email.Email, // list of receivers
+                        subject: req.body.subject, // Subject line
+                        text: req.body.message, // plain text body
+                        html: content
+                    });
+                })
+            )
         } catch (error) {
             console.log(error)
             return res

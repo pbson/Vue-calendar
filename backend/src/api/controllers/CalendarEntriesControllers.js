@@ -1,7 +1,6 @@
 import CalendarEntries from "../models/CalendarEntries";
 import BaseCalendar from "../models/BaseCalendars";
 import Color from "../models/Colors";
-import Rule from "../models/AccessRules";
 import User from "../models/Users";
 import isId from '../helpers/isId'
 import isDocumentExist from '../helpers/isDocumentExist'
@@ -16,7 +15,7 @@ export default {
                         path: 'CalendarId ColorId',
                     }
                 })
-                // .populate('CalendarLists')
+            // .populate('CalendarLists')
             if (calendarList) {
                 return res
                     .status(200)
@@ -45,7 +44,7 @@ export default {
             let calendar = await CalendarEntries
                 .findById(req.query.id)
                 .populate({
-                        path: 'CalendarId ColorId AccessRuleId',
+                    path: 'CalendarId ColorId',
                 })
 
             if (calendar) {
@@ -74,7 +73,7 @@ export default {
     },
     add: async function (req, res) {
         try {
-            if (!isId(req.body.calendarId) || !isId(req.body.accessRuleId) || !isId(req.body.colorId)) {
+            if (!isId(req.body.calendarId) || !isId(req.body.colorId)) {
                 return res
                     .status(404)
                     .json({
@@ -84,17 +83,14 @@ export default {
             let user = await isDocumentExist(User, req.user._id)
             let baseCalendar = await isDocumentExist(BaseCalendar, req.body.calendarId)
             let color = await isDocumentExist(Color, req.body.colorId)
-            let rule = await isDocumentExist(Rule, req.body.accessRuleId)
 
-            if (user && baseCalendar && color && rule) {
+            if (user && baseCalendar && color) {
                 let calendar = new CalendarEntries();
                 calendar.CalendarId = req.body.calendarId;
-                calendar.AccessRuleId = req.body.accessRuleId;
                 calendar.ColorId = req.body.colorId;
-                calendar.Reminders = req.body.time;
-                calendar.isHidden = req.body.isHidden;
                 calendar.isPrimary = req.body.isPrimary;
-                calendar.save();
+                calendar.Reminders = [],
+                    calendar.save();
 
                 user.CalendarLists.push(calendar._id)
                 user.save();
@@ -122,8 +118,7 @@ export default {
     },
     update: async function (req, res) {
         try {
-            console.log(req.body)
-            if (!isId(req.body.accessRuleId) || !isId(req.body.colorId)) {
+            if (!isId(req.body.colorId)) {
                 return res
                     .status(404)
                     .json({
@@ -132,14 +127,10 @@ export default {
             }
             let user = await isDocumentExist(User, req.user._id)
             let color = await isDocumentExist(Color, req.body.colorId)
-            let rule = await isDocumentExist(Rule, req.body.accessRuleId)
 
-            if (user && color && rule) {
+            if (user && color) {
                 let calendar = await CalendarEntries.findOne({ _id: req.body.id })
-                calendar.AccessRuleId = req.body.accessRuleId;
-                calendar.Reminders = req.body.time;
                 calendar.ColorId = req.body.colorId;
-                calendar.isHidden = req.body.isHidden;
                 calendar.save();
                 return res
                     .status(200)
@@ -205,5 +196,5 @@ export default {
                     status: 'Bad request',
                 })
         }
-    },
+    }
 }

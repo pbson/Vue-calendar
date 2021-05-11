@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const state = {
-    calendarList: null
+    calendarList: []
 }
 
 const getters = {
@@ -14,6 +14,7 @@ const getters = {
             obj['id'] = elem._id
             obj['name'] = elem.CalendarId.CalendarTitle
             obj['color'] = elem.ColorId.CalendarMain
+            obj['baseId'] = elem.CalendarId._id
             return obj
         })
     },
@@ -21,8 +22,10 @@ const getters = {
         return state.calendarList.map(elem => {
             var obj = {}
             obj['id'] = elem.CalendarId._id
+            obj['calEntriesId'] = elem._id
             obj['name'] = elem.CalendarId.CalendarTitle
             obj['color'] = elem.ColorId._id
+            obj['isPrimary'] = elem.isPrimary
             return obj
         })
     }

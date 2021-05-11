@@ -5,19 +5,46 @@
       v-for="item in calendarList"
       :key="item.name"
     >
-      <v-checkbox
-        class="ma-0"
-        v-model="ex4"
-        :label="item.name"
-        :color="item.color"
-        value="red"
-        hide-details
-      ></v-checkbox>
-      <v-btn class="calendarSettings" icon>
+      <v-list-item-icon>
+        <v-icon :color="item.color">mdi-circle </v-icon>
+      </v-list-item-icon>
+
+      <v-list-item-content>
+        <v-list-item-title>{{ item.name }}</v-list-item-title>
+      </v-list-item-content>
+      <v-menu offset-y>
+        <template v-slot:activator="{ on }">
+          <v-btn class="calendarSettings" icon v-on="on">
+            <v-icon color="primary">mdi-dots-vertical</v-icon>
+          </v-btn>
+        </template>
+        <v-card>
+          <v-list>
+            <v-list-tile>
+              <v-list-tile-title
+                class="pl-5 pr-5"
+                @click="$router.push('/calendar-settings')"
+              >
+                <v-icon color="primary">mdi-tools</v-icon>
+                Settings
+              </v-list-tile-title>
+              <v-divider></v-divider>
+              <v-list-tile-title
+                @click="exportCalendar(item.baseId)"
+                class="pl-5 pr-5"
+              >
+                <v-icon color="primary"> mdi-application-export </v-icon>
+                Exports
+              </v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-card>
+      </v-menu>
+      <!-- <v-btn class="calendarSettings" icon>
         <v-icon @click.native="$router.push('/calendar-settings')" dark>
           mdi-dots-vertical
         </v-icon>
-      </v-btn>
+      </v-btn> -->
     </v-list-item>
   </v-list>
 </template>
@@ -34,19 +61,73 @@
 </style>
 
 <script>
+// import axios from "axios";
+
 export default {
   computed: {},
   props: {
-    calendarList: Object,
+    calendarList: Array,
   },
   data() {
-    return {
-      items: [
-        { title: "Home", icon: "mdi-home-city" },
-        { title: "My Account", icon: "mdi-account" },
-        { title: "Users", icon: "mdi-account-group-outline" },
-      ],
-    };
+    return {};
+  },
+  methods: {
+    exportCalendar: async function(id) {
+      try {
+        window.open(`http://localhost:3000/base-calendar/get-events?id=${id}`);
+
+        // await axios({
+        //   url: `http://localhost:3000/base-calendar/get-events?id=${id}`,
+        //   method: "GET",
+        //   headers: {
+        //     "auth-token": token,
+        //   },
+        // });
+        // let events = resp.data.data.Events.map((item) => {
+        //   let resp = {
+        //     start: [
+        //       ...item.OnDay.split("-").map(Number),
+        //       ...item.StartAt.split(":").map(Number),
+        //     ],
+        //     end: [
+        //       ...item.OnDay.split("-").map(Number),
+        //       ...item.EndAt.split(":").map(Number),
+        //     ],
+        //     title: item.EventTitle,
+        //     description: item.EventDescription,
+        //   };
+        //   if (item.RecurrencePattern) {
+        //     resp.recurrenceRule = item.RecurrencePattern;
+        //   }
+        //   if (item.Attendees) {
+        //     resp.attendees = item.Attendees.map((item) => {
+        //       return {
+        //         name: item.UserId.Name,
+        //         email: item.UserId.Email,
+        //         partstat: "ACCEPTED",
+        //       };
+        //     });
+        //   }
+        //   return resp;
+        // });
+        // ics.createEvents(events, (error, value) => {
+        //   if (error) {
+        //     console.log(error);
+        //     return;
+        //   }
+        //   console.log(value);
+        // });
+
+        // let icsArr = resp.data.data.Events.map(item=>{
+        //   return {
+
+        //   }
+        // })
+        // return resp
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 };
 </script>

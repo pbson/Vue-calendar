@@ -8,6 +8,7 @@ import CalendarEntries from './modules/CalendarEntries'
 import Users from './modules/Users'
 import AccessRules from './modules/AccessRules'
 import Colors from './modules/Colors'
+import Events from './modules/Events'
 
 Vue.use(Vuex)
 
@@ -24,6 +25,7 @@ export default new Vuex.Store({
         CalendarEntries,
         Users,
         AccessRules,
-        Colors
+        Colors,
+        Events
     }
 })

@@ -24,7 +24,6 @@ const mutations = {
 
 const actions = {
     addCalendarList: async function ({state}) {
-        console.log('i am action')
         const token = localStorage.getItem('token');
         try {
             let resp = await axios({

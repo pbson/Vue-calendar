@@ -5,13 +5,14 @@
       md="7"
       class="d-flex flex-column align-center justify-center"
     >
-      <div class="main">
+      <div class="main text-center">
         <h1 class="mb-10 text-center mt-4">Start using SCal</h1>
         <v-form
           ref="form"
           v-model="valid"
           lazy-validation
           @submit.prevent="register"
+          class="text-center"
         >
           <v-text-field
             id="name"
@@ -79,7 +80,7 @@
       md="5"
       class="d-flex flex-row sidepanel justify-center align-center"
     >
-      <div class="sidepanel">
+      <div class="sidepanel text-center">
         <h1 class="dark--text sidepanel__main-text">Discover SCal</h1>
         <h2 class="sidepanel__secondary-text">
           Discover the world’s top Designers & Creatives.
@@ -107,7 +108,7 @@
 
 <script>
 import { mapActions } from "vuex";
-import axios from 'axios'
+import axios from "axios";
 
 export default {
   data() {
@@ -140,13 +141,15 @@ export default {
     ...mapActions([
       "addBaseCalendar", //also supports payload `this.nameOfAction(amount)`
     ]),
-    addCalendar: async function() {
+    sendAddCalendarApi: async function(cal) {
       try {
         const token = localStorage.getItem("token");
         let baseCalendar = {
-          title: "Main Calendar",
-          description: "This is your one and only main calendar",
+          title: cal.title,
+          description: cal.description,
           events: [],
+          accessRuleId: "607429067a1850bd9014fdf9",
+          isHidden: true,
         };
         let resp = await axios({
           url: "http://localhost:3000/base-calendar/add",
@@ -158,11 +161,9 @@ export default {
         });
         let calendarEntries = {
           calendarId: resp.data.data._id,
-          accessRuleId: "607429067a1850bd9014fdf9",
-          colorId: "6071c9d085a2fbbac38d90e6",
-          isHidden: false,
+          colorId: cal.colorId,
           isPrimary: true,
-          time: 30
+          time: 30,
         };
         await axios({
           url: "http://localhost:3000/calendar-entries/add",
@@ -175,6 +176,23 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+    addCalendar: function() {
+      this.sendAddCalendarApi({
+        title: "Main Calendar",
+        description: "This is your one and only main calendar",
+        colorId: "6071c9d085a2fbbac38d90e6",
+      });
+      this.sendAddCalendarApi({
+        title: "Reminder",
+        description: "This is your reminder calendar",
+        colorId: "6071ca2185a2fbbac38d90e7",
+      });
+      this.sendAddCalendarApi({
+        title: "Task",
+        description: "This is your task calendar",
+        colorId: "6071ca3885a2fbbac38d90e8",
+      });
     },
     register: async function() {
       let data = {

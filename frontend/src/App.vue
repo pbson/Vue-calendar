@@ -19,10 +19,10 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,400;0,500;1,300&display=swap');
 
 #app {
-font-family: 'Work Sans', sans-serif;  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: $color-text-primary;
+// font-family: 'Work Sans', sans-serif;  -webkit-font-smoothing: antialiased;
+//   -moz-osx-font-smoothing: grayscale;
+//   text-align: center;
+//   color: $color-text-primary;
 }
 #nav {
   padding: 30px;

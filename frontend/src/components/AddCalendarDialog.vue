@@ -5,7 +5,7 @@
         <v-btn
           v-bind="attrs"
           v-on="on"
-          class="ml-3 addCalendarButton elevation-0"
+          class="ml-3 addCalendarButton elevation-5"
           fab
           dark
         >
@@ -15,13 +15,11 @@
       <v-card>
         <form @submit.prevent="addCalendar">
           <v-card-title>
-            <h1 class="headline">Add calendar</h1>
+            Add calendar
           </v-card-title>
           <v-card-text>
             <v-container>
               <v-row>
-                <b></b>
-                <h2>Calendar information</h2>
                 <v-col cols="12">
                   <v-text-field
                     v-model="title"
@@ -38,6 +36,31 @@
                     required
                   ></v-textarea>
                 </v-col>
+                <v-row class="pa-6 d-flex flex-column">
+                  <v-row>
+                    <v-col cols="6">
+                      <v-select
+                        prepend-icon="mdi-share"
+                        :items="['Public', 'Private']"
+                        v-model="selectPrivacy"
+                        label="Privacy"
+                        required
+                      ></v-select>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-select
+                        v-if="selectPrivacy == 'Public'"
+                        prepend-icon="mdi-lock"
+                        :items="rules"
+                        v-model="selectRule"
+                        item-text="name"
+                        item-value="id"
+                        label="Access Rule*"
+                        required
+                      ></v-select>
+                    </v-col>
+                  </v-row>
+                </v-row>
                 <v-col cols="6" sm="6">
                   <v-select
                     v-model="selectColor"
@@ -47,45 +70,17 @@
                     item-value="id"
                     label="Color*"
                     required
-                  ></v-select>
+                  >
+                    <template slot="item" slot-scope="data">
+                      <!-- HTML that describe how select should render items when the select is open -->
+                      {{ data.item.name }}
+                      <br>
+                      <v-icon :color="data.item.name">mdi-circle </v-icon>
+                    </template>
+                  </v-select>
                 </v-col>
-                <v-col cols="6" sm="6">
-                  <v-select
-                    v-model="selectRule"
-                    prepend-icon="mdi-lock"
-                    :items="rules"
-                    item-text="name"
-                    item-value="id"
-                    label="Access Rule*"
-                    required
-                  ></v-select>
-                </v-col>
-                <h2>Notifications before</h2>
-                <v-row class="pa-3">
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model="time"
-                      prepend-icon="mdi-alarm"
-                      single-line
-                      type="number"
-                      label="30"
-                      required
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      prepend-icon="mdi-alarm"
-                      single-line
-                      type="number"
-                      label="Minute"
-                      disabled
-                      required
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
               </v-row>
             </v-container>
-            <small>*indicates required field</small>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -113,7 +108,7 @@
 </style>
 <script>
 import axios from "axios";
-import { mapActions } from 'vuex';
+import { mapActions } from "vuex";
 
 export default {
   data() {
@@ -121,16 +116,16 @@ export default {
       title: null,
       description: null,
       selectColor: null,
-      selectRule: null,
-      time: null,
+      selectRule: '607429067a1850bd9014fdf9',
       minute: null,
       dialog: false,
       color: [],
       rules: [],
+      selectPrivacy: null,
     };
   },
   methods: {
-    ...mapActions(['addCalendarList']),
+    ...mapActions(["addCalendarList"]),
     getColor: async () => {
       try {
         const token = localStorage.getItem("token");
@@ -178,6 +173,8 @@ export default {
           title: this.title,
           description: this.description,
           events: [],
+          isHidden: this.selectPrivacy == "Public" ? false : true,
+          accessRuleId: this.selectRule,
         };
         let resp = await axios({
           url: "http://localhost:3000/base-calendar/add",
@@ -189,10 +186,7 @@ export default {
         });
         let calendarEntries = {
           calendarId: resp.data.data._id,
-          accessRuleId: this.selectRule,
           colorId: this.selectColor,
-          time: this.time,
-          isHidden: false,
           isPrimary: false,
         };
         resp = await axios({
@@ -203,7 +197,7 @@ export default {
             "auth-token": token,
           },
         });
-this.addCalendarList();
+        this.addCalendarList();
         this.dialog = false;
       } catch (error) {
         console.log(error);

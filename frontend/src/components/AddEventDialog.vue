@@ -2,17 +2,22 @@
   <div justify="center">
     <v-dialog v-model="dialog" persistent max-width="900px">
       <template v-slot:activator="{ on, attrs }">
-        <v-btn rounded v-bind="attrs" v-on="on" class="button elevation-0">
-          New event
-          <v-icon right dark>
-            mdi-cloud-upload
+        <v-btn rounded v-bind="attrs" v-on="on" class="button elevation-5">
+          <v-icon left dark>
+            mdi-plus-circle
           </v-icon>
+          Create
         </v-btn>
       </template>
       <v-card>
-        <v-card-title>
-          <h1 class="headline">Add event</h1>
-        </v-card-title>
+        <h2 class="pt-5 text-center" primary-title>
+          Select one to create
+        </h2>
+        <v-tabs class="mb-5" fixed-tabs color=" darken-1">
+          <v-tab @click="type = 'event'; resetField()"> Event </v-tab>
+          <v-tab @click="type = 'reminder'; resetField()"> Reminder </v-tab>
+          <v-tab @click="type = 'task'; resetField()"> Task </v-tab>
+        </v-tabs>
         <v-card-text>
           <v-container>
             <v-row>
@@ -23,7 +28,7 @@
               <v-text-field
                 v-model="title"
                 prepend-icon="mdi-format-title"
-                label="Event Title*"
+                label="Title*"
                 required
               ></v-text-field>
             </v-col>
@@ -32,7 +37,7 @@
               <v-textarea
                 v-model="description"
                 prepend-icon="mdi-square-edit-outline"
-                label="Event Description*"
+                label="Description*"
                 required
               ></v-textarea>
             </v-col>
@@ -54,7 +59,7 @@
                       slot="activator"
                       v-model="fromDate"
                       label="From Date"
-                      hint="Event on this date"
+                      hint="On this date"
                       prepend-icon="mdi-calendar"
                       persistent-hint
                       v-bind="attrs"
@@ -85,7 +90,7 @@
                     <v-text-field
                       v-model="fromTime"
                       label="From time"
-                      hint="Event start on this time"
+                      hint="On this time"
                       prepend-icon="mdi-clock"
                       persistent-hint
                       readonly
@@ -102,7 +107,11 @@
                 </v-menu>
               </v-col>
               <!-- Event end time -->
-              <v-col cols="12" sm="4" v-if="fromTime">
+              <v-col
+                cols="12"
+                sm="4"
+                v-if="type == 'event' && fromTime"
+              >
                 <v-menu
                   ref="toTimeMenu"
                   v-model="toTimeMenu"
@@ -118,7 +127,7 @@
                     <v-text-field
                       v-model="toTime"
                       label="To time"
-                      hint="Event end on this time"
+                      hint="On this time"
                       prepend-icon="mdi-clock"
                       persistent-hint
                       readonly
@@ -135,15 +144,12 @@
                 </v-menu>
               </v-col>
               <!-- Is recurring -->
-              <v-row>
-                <h2 class="mt-8">Event recurrance</h2>
-                <v-col cols="12">
-                  <v-checkbox
-                    v-model="isRecurring"
-                    label="Repeat event "
-                  ></v-checkbox>
-                </v-col>
-              </v-row>
+            </v-row>
+            <v-row v-if="type == 'event' || type == 'reminder'">
+              <h2 class="mt-8">Recurrance</h2>
+              <v-col cols="12">
+                <v-checkbox v-model="isRecurring" label="Repeat "></v-checkbox>
+              </v-col>
             </v-row>
 
             <v-row class="pa-3 mt-0" v-if="isRecurring">
@@ -171,42 +177,9 @@
                   single-line
                 ></v-select>
               </v-col>
-              <!-- Recurring until date -->
-              <v-col cols="4">
-                <div>
-                  <v-menu
-                    ref="untilDateMenu"
-                    v-model="untilDateMenu"
-                    :close-on-content-click="false"
-                    :nudge-right="40"
-                    transition="scale-transition"
-                    offset-y
-                    max-width="290px"
-                    min-width="290px"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field
-                        slot="activator"
-                        v-model="untilDate"
-                        label="Until Date"
-                        hint="Event end on this date"
-                        prepend-icon="mdi-calendar"
-                        persistent-hint
-                        v-bind="attrs"
-                        v-on="on"
-                      ></v-text-field>
-                    </template>
-                    <v-date-picker
-                      v-model="untilDate"
-                      no-title
-                      @input="untilDateMenu = false"
-                    ></v-date-picker>
-                  </v-menu>
-                </div>
-              </v-col>
             </v-row>
 
-            <v-row class="d-flex flex-column pa-3 mt-0">
+            <v-row v-if="type == 'event'" class="d-flex flex-column pa-3 mt-0">
               <v-row>
                 <h2 class="mt-8 float-left">Calendar</h2>
               </v-row>
@@ -230,6 +203,33 @@
                     v-model="responseStatus"
                     prepend-icon="mdi-format-title"
                     label="Response status*"
+                    required
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-row>
+            <v-row v-if="type == 'event'" class="d-flex flex-column pa-3 mt-4">
+              <v-row>
+                <h2>Notifications before</h2>
+              </v-row>
+              <v-row>
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="minute"
+                    prepend-icon="mdi-alarm"
+                    single-line
+                    type="number"
+                    label="30"
+                    required
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field
+                    prepend-icon="mdi-alarm"
+                    single-line
+                    type="number"
+                    label="Minute"
+                    disabled
                     required
                   ></v-text-field>
                 </v-col>
@@ -263,16 +263,18 @@
 </style>
 <script>
 import axios from "axios";
-import { mapGetters,mapActions } from 'vuex';
+import { mapGetters, mapActions } from "vuex";
 import { RRule } from "rrule";
 
 export default {
   data: () => ({
+    type: "event",
+
     dialog: false,
     isRecurring: false,
 
-    eventTitle: "",
-    eventDescription: "",
+    title: "",
+    description: "",
 
     fromDateMenu: false,
     fromDate: null,
@@ -282,9 +284,6 @@ export default {
 
     toTimeMenu: false,
     toTime: null,
-
-    untilDateMenu: false,
-    untilDate: null,
 
     weekdayNames: ["SU", "MO", "TU", "WE", "TH", "FR", "SA"],
     recurringDay: [],
@@ -296,56 +295,59 @@ export default {
     selectCalendar: null,
 
     responseStatus: null,
+    minute: null,
   }),
   computed: {
-    ...mapGetters(["getCalendarList","getEventDialogCalendarList"]),
+    ...mapGetters(["getEventDialogCalendarList"]),
   },
   methods: {
     ...mapActions(["addCalendarList"]),
-    subtractTime: function () {
-
-    },
+    subtractTime: function() {},
     createRRULEString: function(payload) {
       if (!payload.isRecurring) {
         return "";
       }
-      let year = new Date(payload.startDate).getFullYear();
-      let monthUTC = new Date(payload.startDate).getUTCMonth();
-      let day = payload.startDate.substr(8, 2);
-      let hour = payload.startTime.split(":")[0];
-      let minutes = payload.startTime.split(":")[1];
-      let untilDate = payload.untilDate
+      // let year = new Date(payload.startDate).getFullYear();
+      // let monthUTC = new Date(payload.startDate).getUTCMonth();
+      // let day = payload.startDate.substr(8, 2);
+      // let hour = payload.startTime.split(":")[0];
+      // let minutes = payload.startTime.split(":")[1];
 
       const rule = new RRule({
         freq: RRule.WEEKLY,
-        byweekday:this.recurringDay.map((dayNames) => RRule[dayNames]),
+        byweekday: this.recurringDay.map((dayNames) => RRule[dayNames]),
         interval: this.interval,
-        dtstart: new Date(Date.UTC(year, monthUTC, day, hour, minutes)),
-        until: new Date(Date.parse(untilDate)),
+        // dtstart: new Date(Date.UTC(year, monthUTC, day, hour, minutes)),
       });
-      return rule.toString();
+      console.log(rule.toString())
+      return rule.toString().substring(6);
     },
-    addEvent: async function() {
+    resetField: function() {
+      this.isRecurring = false;
+      this.title = "";
+      this.description = "";
+      this.fromDateMenu = false;
+      this.fromDate = null;
+      this.fromTimeMenu = false;
+      this.fromTime = null;
+      this.toTimeMenu = false;
+      this.toTime = null;
+      this.recurringDay = [];
+      this.interval = null;
+      this.selectCalendar = null;
+      this.responseStatus = null;
+      this.minute = 0;
+    },
+    sendAddEventApi: async function(event) {
       try {
         const token = localStorage.getItem("token");
         let recurrencePattern = await this.createRRULEString({
-            isRecurring: this.isRecurring,
-            startDate: this.fromDate,
-            startTime: this.fromTime,
-            untilDate: this.untilDate
-        })
-        let event = {
-          title: this.title,
-          description: this.description,
-          startAt: this.fromTime,
-          endAt: this.toTime,
-          onDay: this.fromDate,
-          isRecurring: this.isRecurring,
-          recurrencePattern: recurrencePattern,
-          responseStatus: this.responseStatus,
-          calendarId: this.selectCalendar.id,
-          colorId: this.selectCalendar.color,
-        };
+          isRecurring: event.isRecurring,
+          startDate: event.onDay,
+          startTime: event.startAt,
+        });
+        event["recurrencePattern"] = recurrencePattern;
+
         await axios({
           url: "http://localhost:3000/event/add",
           data: event,
@@ -354,9 +356,63 @@ export default {
             "auth-token": token,
           },
         });
+        location.reload();
         this.dialog = false;
       } catch (error) {
         console.log(error);
+      }
+    },
+    addEvent: async function() {
+      if (this.type == "event") {
+        this.sendAddEventApi({
+          title: this.title,
+          description: this.description,
+          startAt: this.fromTime,
+          endAt: this.toTime,
+          onDay: this.fromDate,
+          isRecurring: this.isRecurring,
+          responseStatus: this.responseStatus,
+          calendarId: this.selectCalendar.id,
+          colorId: this.selectCalendar.color,
+          minute: this.minute,
+          calEntriesId: this.selectCalendar.calEntriesId,
+          type: "event",
+        });
+      } else if (this.type == "reminder") {
+        let calendar = this.calendarList.find(
+          (elem) => elem.name == "Reminder" && elem.isPrimary == true
+        );
+        this.sendAddEventApi({
+          title: this.title,
+          description: this.description,
+          startAt: this.fromTime,
+          endAt: this.fromTime,
+          onDay: this.fromDate,
+          isRecurring: this.isRecurring,
+          responseStatus: "",
+          calendarId: calendar.id,
+          colorId: calendar.color,
+          minute: 0,
+          calEntriesId: calendar.calEntriesId,
+          type: "reminder",
+        });
+      } else if (this.type == "task") {
+        let calendar = this.calendarList.find((elem) => elem.name == "Task" && elem.isPrimary == true);
+        this.sendAddEventApi({
+          title: this.title,
+          description: this.description,
+          startAt: this.fromTime,
+          endAt: this.fromTime,
+          onDay: this.fromDate,
+          isRecurring: false,
+          responseStatus: "",
+          calendarId: calendar.id,
+          colorId: calendar.color,
+          minute: 0,
+          isComplete: false,
+          calEntriesId: calendar.calEntriesId,
+          type: "task",
+        });
       }
     },
   },

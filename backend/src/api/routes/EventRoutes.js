@@ -6,8 +6,9 @@ const router = Router();
 
 router.post("/add", verifyToken, controller.add);
 router.delete('/delete', verifyToken, controller.delete);
-router.put("/update", verifyToken, controller.update);
-// router.get("/get", verifyToken, controller.get)
-// router.get("/getall", verifyToken, controller.getAll)
+router.post("/update", verifyToken, controller.update);
+router.get("/get", verifyToken, controller.get)
+router.get("/invite-reply", controller.invitationReply)
+router.get("/getall", verifyToken, controller.getAll)
 
 module.exports = router;

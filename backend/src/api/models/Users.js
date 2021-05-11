@@ -6,7 +6,7 @@ const userSchema = new Schema({
         type: String,
         required: true,
         min: 6,
-        max: 25
+        max: 25,
     },
     Email:{
         type: String,
@@ -35,5 +35,6 @@ const userSchema = new Schema({
     CalendarLists:[{ type: Schema.Types.ObjectId, ref: 'CalendarEntries' }]
 })
 userSchema.plugin(timestamps);
+userSchema.index({'Email': 'text'});
 
 export default model('User', userSchema)

@@ -4,9 +4,69 @@ import User from "../models/Users";
 import Event from "../models/Events";
 
 export default {
-    get: async function (req, res) {
+    getAll: async function (req, res) {
         try {
-            let event = await Event.findById({ _id: req.body.id })
+            let eventList = []
+            let reminderList = []
+            let calendarList = await User.findOne({ _id: req.user._id }).select({ "CalendarLists.CalendarId": 1, "_id": 1 })
+                .populate({
+                    path: 'CalendarLists',
+                    populate: {
+                        path: 'CalendarId Events'
+                    }
+                })
+            calendarList.CalendarLists.map((item) => {
+                eventList = [
+                    ...eventList,
+                    ...item.CalendarId.Events
+                ]
+                return eventList
+            })
+            calendarList.CalendarLists.map((item) => {
+                reminderList = [
+                    ...reminderList,
+                    ...item.Reminders
+                ]
+                return reminderList
+            })
+            let result = await Event.find()
+                .where('_id')
+                .in(eventList)
+                .populate('ColorId', 'EventMain EventSecondary')
+                .populate('BaseCalendarId', 'CalendarTitle')
+                .populate('Attendees.UserId', 'Email Name')
+
+            const map = new Map();
+            result.forEach(item => map.set(item._id.toString(), item));
+            reminderList.forEach(item => map.set(item.eventId, { ...map.get(item.eventId).toObject(), minute: item.minute }));
+            const mergedArr = Array.from(map.values());
+
+            if (eventList) {
+                return res
+                    .status(200)
+                    .json({
+                        status: 'OK',
+                        data: mergedArr
+                    })
+            } else {
+                return res
+                    .status(404)
+                    .json({
+                        status: 'Not found',
+                    })
+            }
+        } catch (error) {
+            console.log(error)
+            return res
+                .status(400)
+                .json({
+                    status: 'Bad request',
+                })
+        }
+    },
+    get: async function (req, res) { 
+        try {
+            let event = await Event.findById({ _id: req.query.id })
             if (event) {
                 return res
                     .status(200)
@@ -39,20 +99,28 @@ export default {
                 event.OnDay = req.body.onDay
                 event.StartAt = req.body.startAt
                 event.EndAt = req.body.endAt
-                event.Duration = req.body.duration
                 event.IsRecurring = req.body.isRecurring
                 event.RecurrencePattern = req.body.recurrencePattern
-                event.Owner =  req.user._id
+                event.Owner = req.user._id
                 event.ResponseStatus = req.body.responseStatus
                 event.ColorId = req.body.colorId
                 event.BaseCalendarId = req.body.calendarId
+                event.Type = req.body.type
+                event.IsComplete = req.body.isComplete
 
                 event.save();
 
                 let calendar = await BaseCalendar.findOne({ _id: req.body.calendarId })
                 calendar.Events.push(event._id)
                 calendar.save();
-                
+
+                let calEntries = await CalendarEntries.findOne({ _id: req.body.calEntriesId })
+                calEntries.Reminders.push({
+                    minute: req.body.minute,
+                    eventId: event._id
+                })
+                calEntries.save()
+
                 return res
                     .status(200)
                     .json({
@@ -79,21 +147,29 @@ export default {
         try {
             let user = await User.findOne({ _id: req.user._id })
             if (user) {
-                let event = await Event.findOne({_id: req.body.id})
-                event.EventTitle = req.body.title;
-                event.EventDescription = req.body.description
-                event.StartAt = req.body.startAt
-                event.EndAt = req.body.endAt
-                event.Duration = req.body.duration
-                event.IsAllDay = req.body.isAllDay
-                event.IsRecurring = req.body.isRecurring
-                event.RecurrencePattern = req.body.ecurrencePattern
-                event.Owner =  req.user._id
-                event.ResponseStatus = req.body.responseStatus
-                event.ColorId = req.body.colorId
+                let fieldToUpdate = {
+                    EventTitle: req.body.title,
+                    EventDescription: req.body.description,
+                    OnDay: req.body.onDay,
+                    StartAt: req.body.startAt,
+                    EndAt: req.body.endAt,
+                    IsRecurring: req.body.isRecurring,
+                    Owner: req.user._id,
+                    ResponseStatus: req.body.responseStatus,
+                    ColorId: req.body.colorId,
+                    BaseCalendarId: req.body.calendarId,
+                    RecurrencePattern: req.body.recurrencePattern,
+                    IsComplete: req.body.isComplete
+                };
+                for (const [key, value] of Object.entries(fieldToUpdate)) {
+                    if (!value) {
+                        delete fieldToUpdate[key];
+                    }
+                }
+                let event = await Event.findOneAndUpdate({ _id: req.query.id }, { $set: { ...fieldToUpdate } }, { new: true });
 
                 event.save();
-                
+
                 return res
                     .status(200)
                     .json({
@@ -118,12 +194,16 @@ export default {
     },
     delete: async function (req, res) {
         try {
-            let event = await Event.findById( req.body.id )
-            console.log(event)
-            let calendar = await BaseCalendar.findOne({_id:event.BaseCalendar})
+            let event = await Event.findById(req.query.id)
+            let calendar = await BaseCalendar.findOne({ _id: event.BaseCalendarId })
+            let calendarEntries = await CalendarEntries.updateMany({ 'Reminders.eventId': event._id }, {
+                $pull: {
+                    Reminders: { 'eventId': event._id }
+                }
+            })
 
-
-            let index = calendar.Events.indexOf( event.BaseCalendar );
+            console.log(calendarEntries);
+            let index = calendar.Events.indexOf(event.BaseCalendarId);
             if (index > -1) {
                 calendar.Events.splice(index, 1);
             }
@@ -152,4 +232,63 @@ export default {
                 })
         }
     },
+    invitationReply: async function (req, res) {
+        try {
+            if (req.query.ans == '1') {
+                // Attendees list update 
+                let fieldToUpdate = {
+                    UserId: req.query.receiver,
+                    AccessRuleId: req.query.rule,
+                    ResponseStatus: 'ACCEPTED',
+                };
+                for (const [key, value] of Object.entries(fieldToUpdate)) {
+                    if (!value) {
+                        delete fieldToUpdate[key];
+                    }
+                }
+                let event = await Event.findOne({ _id: req.query.eventId });
+                event.Attendees.push(fieldToUpdate)
+
+                event.save();
+
+                // Add event to Main calendar of Receiver
+                let user = await User.findById(req.query.receiver);
+                try {
+                    for (let item of user.CalendarLists) {
+                        let calEntries = await CalendarEntries.findById(item)
+                        console.log(calEntries)
+                        if (calEntries.isPrimary == true) {
+                            let cal = await BaseCalendar.findById(calEntries.CalendarId)
+                            console.log(cal)
+                            cal.Events.push(req.query.eventId);
+                            cal.save();
+                            break;
+                        }
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+                return res
+                    .status(200)
+                    .json({
+                        status: 'OK'
+                    })
+            } else {
+                console.log(error)
+                return res
+                    .status(200)
+                    .json({
+                        status: 'OK'
+                    })
+            }
+        } catch (error) {
+            console.log(error)
+            return res
+            .status(404)
+            .json({
+                status: error
+            })
+        }
+    }
+
 }

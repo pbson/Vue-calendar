@@ -1,119 +1,101 @@
 import axios from 'axios'
+import { rrulestr } from 'rrule';
+import { format, parseISO, endOfMonth } from 'date-fns';
+import { DateTime } from 'luxon';
+
+function leadingZero(num) {
+    return ('0' + num).slice(-2);
+}
+
+function getFocus(focus) {
+    if (!focus || focus === '') {
+        return `${new Date().getFullYear()}-${leadingZero(new Date().getMonth() + 1)}`;
+    }
+    return focus.substr(0, 7);
+}
+
+function createAllEvents(events, focus) {
+    let allEvents = [];
+    // Create all recurring instances within month using RRULE string
+    events.map((item) => {
+        if (item.IsRecurring) {
+            allEvents = [
+                ...allEvents,
+                ...makeRecurringEvents(item, getFocus(focus))
+            ];
+        } else {
+            allEvents.push({
+                start: `${item.OnDay} ${item.StartAt}`,
+                end: `${item.OnDay} ${item.EndAt}`,
+                name: item.EventTitle,
+                color: item.ColorId.EventMain,
+                textcolor: item.ColorId.EventSecondary,
+                description: item.EventDescription,
+                id: item._id,
+                baseCalendarId: item.BaseCalendarId._id,
+                baseCalendarTitle: item.BaseCalendarId.CalendarTitle,
+                recurrencePattern: item.RecurrencePattern,
+                responseStatus: item.ResponseStatus,
+                reminder: item.minute,
+                category: item.Type,
+                attendees: item.Attendees
+            })
+        }
+    });
+    return allEvents;
+}
+
+function makeRecurringEvents(payload, focus) {
+    let recurringEvents = [];
+    let year = parseISO(focus).getFullYear();
+    let monthUTC = new Date(focus).getUTCMonth();
+
+    // Subtract timezone offset to get the correct recurring start day and recurring end day used in .between function in recurDates
+    let startDate = new Date(year, monthUTC, 1);
+    let recurStart = new Date(startDate.valueOf() - startDate.getTimezoneOffset() * 60 * 1000);
+    let endDate = endOfMonth(new Date(year, monthUTC));
+    let recurEnd = new Date(endDate.valueOf() - endDate.getTimezoneOffset() * 60 * 1000);
+
+    let recurDates = rrulestr(payload.RecurrencePattern)
+        .between(recurStart, recurEnd)
+        .map((date) => format(DateTime.fromJSDate(date).toUTC().setZone('local', { keepLocalTime: true }).toJSDate(), 'yyyy-MM-dd'));
+
+    for (let recurDate of recurDates) {
+        let tmpObj = {
+            start: `${recurDate} ${payload.StartAt}`,
+            end: `${recurDate} ${payload.EndAt}`,
+            name: payload.EventTitle,
+            color: payload.ColorId.EventSecondary,
+            textcolor: payload.ColorId.EventSecondary,
+            description: payload.EventDescription,
+            id: payload._id,
+            baseCalendarId: payload.BaseCalendarId._id,
+            baseCalendarTitle: payload.BaseCalendarId.CalendarTitle,
+            recurrencePattern: payload.RecurrencePattern,
+            responseStatus: payload.ResponseStatus,
+            reminder: payload.minute,
+            category: payload.Type,
+            attendees: payload.Attendees
+        };
+        recurringEvents.push(tmpObj);
+    }
+    return recurringEvents;
+}
 
 const state = {
-    eventOpen: false, // Dialog open/closed status
-    newEventSignal: false, // Signal to components that an event has been created or deleted to repopulate names
-    caregiverNames: [], // Names of all possible caregivers in view. Used in CalendarSideBar
-    clientNames: [], // Names of all the clients in view in view. Used in CalendarSideBar
-    selectedPerson: {}, // Sets the calendar's view to this person when clicking on names in CalendarSideBar
     instances: [], // All events shown in calendar view - calculated at runtime by combining state.events and state.exceptions
-    tempCaregiver: '', // Temporary storage used when adding a new caregiver. Used in CalendarSideBar
-    tempClient: '', // Temporary storage used when adding a new client. Used in CalendarSideBar
-    events: [
-        // Recurring events
-        {
-            cal_id: `${uuidv4()}`,
-            caregiver: 'Sigourney Reaver',
-            client: 'Michelle Milano',
-            start: `${new Date().getFullYear()}-01-02 07:00`,
-            end: `${new Date().getFullYear()}-01-02 11:00`,
-            duration: '4',
-            isRecurring: true,
-            rruleString: 'DTSTART:20200102T070000Z\nRRULE:FREQ=WEEKLY;BYDAY=TU,TH;INTERVAL=1;UNTIL=20250101T080000Z'
-        },
-        {
-            cal_id: `${uuidv4()}`,
-            caregiver: 'Harry Berry',
-            client: 'Randy Johnson',
-            start: `${new Date().getFullYear()}-01-01 12:00`,
-            end: `${new Date().getFullYear()}-01-01 20:00`,
-            duration: '8',
-            isRecurring: true,
-            rruleString: 'DTSTART:20200101T120000Z\nRRULE:FREQ=WEEKLY;BYDAY=MO,WE,FR;INTERVAL=2;UNTIL=20250101T080000Z'
-        },
-        {
-            cal_id: `${uuidv4()}`,
-            caregiver: 'Walter Boyd',
-            client: 'Sandy Webb',
-            start: `${new Date().getFullYear()}-01-04 03:00`,
-            end: `${new Date().getFullYear()}-01-04 09:30`,
-            duration: '6.5',
-            isRecurring: true,
-            rruleString: 'DTSTART:20200104T030000Z\nRRULE:FREQ=WEEKLY;BYDAY=SA;INTERVAL=1;UNTIL=20250101T080000Z'
-        },
-        {
-            cal_id: `${uuidv4()}`,
-            caregiver: 'Courtney Rocks',
-            client: 'Ben Carter',
-            start: `${new Date().getFullYear()}-01-05 20:00`,
-            end: `${new Date().getFullYear()}-01-06 08:00`,
-            duration: '12',
-            isRecurring: true,
-            rruleString: 'DTSTART:20200105T200000Z\nRRULE:FREQ=WEEKLY;BYDAY=SU;INTERVAL=1;UNTIL=20250101T080000Z'
-        }
-    ],
-    exceptions: [
-        // One off events or recurring event where data diverged from original data and turned to one time event
-        {
-            cal_id: `${uuidv4()}`,
-            caregiver: 'Randy Hart',
-            client: 'Brad Pizza',
-            start: `${new Date().getFullYear()}-${leadingZero(new Date().getMonth() + 1)}-10 18:00`,
-            end: `${new Date().getFullYear()}-${leadingZero(new Date().getMonth() + 1)}-10 22:00`,
-            duration: '4',
-            isRecurring: false,
-            rruleString: ''
-        }
-    ]
+    events: [],
+    exceptions: [],
+    selectedEvent: null
 }
 
 const getters = {
-    getInstances: (state) => (focus, name, type) => {
+    getInstances: function (state) {
         return state.instances;
     },
-    // getExceptions             : (state) => (focus, name, type) => {
-    //     return state.exceptions;
-    // },
-    // eventOpen                 : (state) => state.eventOpen,
-    // getNamesCaregivers        : (state) => state.caregiverNames,
-    // getNamesClients           : (state) => state.clientNames,
-    // newEventSignal            : (state) => state.newEventSignal,
-    // getSelectedPerson         : (state) => state.selectedPerson,
-    // getCurrentEvent           : (state) => (data) => {
-    //     return state.instances.find((element) => {
-    //         return element.cal_id === data.cal_id && element.start === data.start;
-    //     });
-    // },
-    // getIndexEvent             : (state) => (data) => {
-    //     return state.events.findIndex((element) => {
-    //         return element.cal_id === data.cal_id;
-    //     });
-    // },
-    // getIndexException         : (state) => (data) => {
-    //     return state.exceptions.findIndex((element) => {
-    //         return element.cal_id === data.cal_id;
-    //     });
-    // },
-    // getIndexExceptionDiverged : (state) => (data) => {
-    //     return state.exceptions.findIndex((element) => {
-    //         return element.cal_id === data.cal_id && element.actionType.originalData.start === data.start;
-    //     });
-    // },
-    // getNames                  : (state, getters) => (current, type) => {
-    //     return [
-    //         ...new Set(
-    //             getters
-    //                 .getInstances(current, '', '')
-    //                 .filter((event) => {
-    //                     return event.start.includes(getFocus(current));
-    //                 })
-    //                 .map((event) => event[type])
-    //                 .sort((a, b) => {
-    //                     return a.split(' ')[1].localeCompare(b.split(' ')[1]);
-    //                 })
-    //         )
-    //     ];
-    // },
+    getSelectedEvent: function (state) {
+        return state.selectedEvent;
+    }
 }
 
 const mutations = {
@@ -126,261 +108,50 @@ const mutations = {
     SET_INIT_EXCEPTIONS(state, payload) {
         state.exceptions = payload;
     },
-    SET_PERSON(state, person) {
-        state.selectedPerson = person;
+    SET_SELECTED_EVENT(state, payload) {
+        state.selectedEvent = payload;
     },
-    ADD_NEW_TEMPORARY_PERSON(state, { name, nameType }) {
-        let addType = nameType === 'caregiverNames' ? 'tempCaregiver' : 'tempClient';
-        state[addType] = name;
-    },
-    CLEAR_TEMP_PERSON(state) {
-        state.tempCaregiver = '';
-        state.tempClient = '';
-    },
-    SET_NEW_EVENT_SIGNAL(state, status) {
-        state.newEventSignal = status;
-    },
-    SET_NAMES(state, namesArray) {
-        let [
-            caregiverNames,
-            clientNames
-        ] = namesArray;
-        state.caregiverNames = caregiverNames;
-        state.clientNames = clientNames;
-    },
-    SET_DIALOG(state, dialogStatus) {
-        state.eventOpen = dialogStatus;
-    },
-    ADD_EVENT(state, payload) {
-        state.events.push(payload);
-        state.newEventSignal = true;
-    },
-    UPDATE_EVENT(state, { index, updatedEvent }) {
-        state.events.splice(index, 1, updatedEvent);
-        state.newEventSignal = true;
-    },
-    DELETE_EVENTS_MULTIPLE(state, eventsFound) {
-        state.events = state.events.filter((ev) => !eventsFound.includes(ev));
-        state.newEventSignal = true;
-    },
-    ADD_EXCEPTION(state, payload) {
-        state.exceptions.push(payload);
-        state.newEventSignal = true;
-    },
-    UPDATE_EXCEPTION(state, { index, payload }) {
-        state.exceptions.splice(index, 1, payload);
-        state.newEventSignal = true;
-    },
-    DELETE_EXCEPTION(state, index) {
-        state.exceptions.splice(index, 1);
-        state.newEventSignal = true;
-    }
 }
 
 const actions = {
-    async initInstances({ commit, state, dispatch }, payload) {
+    initInstances: async function ({ commit, state }, payload) {
         try {
-            /* In a real application, get events and exceptions from database and set the states. Since states are already set for this example, this is commented out
-            let { data: events } = await axios.get('process.env.API_URL/events');
-            let { data: exceptions } = await axios.get('process.env.API_URL/exceptions');
-            commit('SET_INIT_EVENTS', [events]);
-            commit('SET_INIT_EXCEPTIONS', [exceptions]);
-            */
-
+            const token = localStorage.getItem('token');
+            let events = await axios({
+                url: 'http://localhost:3000/event/getall',
+                method: 'GET',
+                headers: {
+                    'auth-token': token
+                }
+            });
+            commit('SET_INIT_EVENTS', [...events.data.data]);
             // Create all the events from recurring, one time and diverged events
             let allEvents = createAllEvents(
                 [
-                    // using mock data
                     ...state.events
                 ],
-                [
-                    // using mock data
-                    ...state.exceptions
-                ],
-                getFocus(payload.focus),
-                '',
-                ''
+                getFocus(payload.focus)
             );
-
             commit('SET_INIT_INSTANCES', allEvents);
         } catch (e) {
-            dispatch('updateSnackMessage', `Error at ${e}`, { root: true });
+            console.log(e)
         }
     },
-    // async actionCreateNewEvent({ commit, state, dispatch }, payload) {
-    //     try {
-    //         if (!payload.isRecurring) {
-    //             commit('ADD_EXCEPTION', payload);
-    //             // If adding a temporary person, clear it from state or sidebar shows double of said person
-    //             commit('CLEAR_TEMP_PERSON');
-    //         } else {
-    //             commit('ADD_EVENT', payload);
-    //             commit('CLEAR_TEMP_PERSON');
-    //         }
-    //     } catch (e) {
-    //         dispatch('updateSnackMessage', `Error with ${e}`, { root: true });
-    //     }
-    // },
-    // async updateEvent({ commit, state, getters, dispatch }, payload) {
-    //     if (!payload.isRecurring) {
-    //         /* Updating non recurring exceptions have 2 types
-    //         [1] One time exception ( Regular one time event )
-    //         [2] Recurring event that has diverged and turned into one time exception
-    //         */
-    //         if (!payload.actionType) {
-    //             // [1] One time event
-    //             try {
-    //                 let exceptionIndex = getters.getIndexException(payload);
-
-    //                 commit('UPDATE_EXCEPTION', {
-    //                     exceptionIndex,
-    //                     payload
-    //                 });
-    //             } catch (e) {
-    //                 dispatch('updateSnackMessage', `Error with ${e}`, { root: true });
-    //             }
-    //         } else {
-    //             //[2] Recurring event that has diverged and turned into one time exception
-    //             try {
-    //                 let divergedIndex = getters.getIndexExceptionDiverged(payload);
-    //                 commit('UPDATE_EXCEPTION', {
-    //                     divergedIndex,
-    //                     payload
-    //                 });
-    //             } catch (e) {
-    //                 dispatch('updateSnackMessage', `Error with ${e}`, { root: true });
-    //             }
-    //         }
-    //     } else {
-    //         switch (payload.actionType.description) {
-    //             // Handle updating recurring events
-    //             case 'updateAll': {
-    //                 try {
-    //                     let index = getters.getIndexEvent(payload);
-    //                     let updatedEvent = { ...payload };
-    //                     commit('UPDATE_EVENT', {
-    //                         index,
-    //                         updatedEvent
-    //                     });
-    //                 } catch (e) {
-    //                     dispatch('updateSnackMessage', `Error with ${e}`, { root: true });
-    //                 }
-    //                 break;
-    //             }
-    //             case 'updateInstance': {
-    //                 try {
-    //                     payload.actionType.description = 'updateInstance';
-    //                     payload.isRecurring = false;
-    //                     payload.rruleString = '';
-    //                     commit('ADD_EXCEPTION', payload);
-    //                 } catch (e) {
-    //                     dispatch('updateSnackMessage', `Error with ${e}`, { root: true });
-    //                 }
-    //                 break;
-    //             }
-    //             case 'updateForward': {
-    //                 try {
-    //                     /* Update recurring event going forward splits the recurring event in 2. 
-    //                     [1] Give new recurring object going forward a new id and add it to state.events
-    //                     [2] Change the original recurrence object's UNTIL string to payload.start which is the start of new recurring object
-    //                     */
-
-    //                     // [1]
-    //                     let recurringObjGoingForward = { ...payload };
-    //                     recurringObjGoingForward.cal_id = uuidv4();
-    //                     commit('ADD_EVENT', recurringObjGoingForward);
-
-    //                     // [2]
-    //                     let index = getters.getIndexEvent(payload);
-    //                     let updatedEvent = changeRecurringEnd({ ...state.events[index] }, payload.start);
-    //                     commit('UPDATE_EVENT', {
-    //                         index,
-    //                         updatedEvent
-    //                     });
-    //                 } catch (e) {
-    //                     dispatch('updateSnackMessage', `Error with ${e}`, { root: true });
-    //                 }
-    //                 break;
-    //             }
-    //             default:
-    //                 dispatch('updateSnackMessage', `Unknown actionType in updateEvent`, { root: true });
-    //         }
-    //     }
-    // },
-    // async deleteEvent({ commit, state, getters, dispatch }, payload) {
-    //     if (!payload.isRecurring) {
-    //         if (!payload.actionType) {
-    //             // Delete one time event
-    //             try {
-    //                 let exceptionIndex = getters.getIndexException(payload);
-    //                 commit('DELETE_EXCEPTION', exceptionIndex);
-    //             } catch (e) {
-    //                 dispatch('updateSnackMessage', `Error with ${e}`, { root: true });
-    //             }
-    //         } else {
-    //             // Delete diverged event from recurring events
-    //             try {
-    //                 let index = getters.getIndexExceptionDiverged(payload);
-    //                 payload.actionType.description = 'deleteInstance';
-
-    //                 commit('UPDATE_EXCEPTION', {
-    //                     index,
-    //                     payload
-    //                 });
-    //             } catch (e) {
-    //                 dispatch('updateSnackMessage', `Error with ${e}`, { root: true });
-    //             }
-    //         }
-    //     } else {
-    //         switch (payload.actionType.description) {
-    //             case 'deleteAll': {
-    //                 try {
-    //                     let eventsFound = state.events.filter((element) => {
-    //                         return element.cal_id === payload.cal_id;
-    //                     });
-
-    //                     if (eventsFound) {
-    //                         commit('DELETE_EVENTS_MULTIPLE', eventsFound);
-    //                     }
-    //                 } catch (e) {
-    //                     dispatch('updateSnackMessage', `Error with ${e}`, { root: true });
-    //                 }
-    //                 break;
-    //             }
-    //             case 'deleteForward': {
-    //                 try {
-    //                     let index = getters.getIndexEvent(payload);
-    //                     let updatedEvent = changeRecurringEnd({ ...state.events[index] }, payload.start);
-    //                     commit('UPDATE_EVENT', {
-    //                         index,
-    //                         updatedEvent
-    //                     });
-    //                 } catch (e) {
-    //                     dispatch('updateSnackMessage', `Error with ${e}`, { root: true });
-    //                 }
-    //                 break;
-    //             }
-    //             case 'deleteInstance': {
-    //                 try {
-    //                     payload.actionType.description = 'deleteInstance';
-    //                     commit('ADD_EXCEPTION', payload);
-    //                 } catch (e) {
-    //                     dispatch('updateSnackMessage', `Error with ${e}`, { root: true });
-    //                 }
-    //                 break;
-    //             }
-
-    //             default:
-    //                 dispatch('updateSnackMessage', `Unknown actionType in deleteEvent`, { root: true });
-    //         }
-    //     }
-    // },
-    // updateSelectedPerson({ commit, state }, person) {
-    //     commit('SET_PERSON', person);
-    // },
-    // dialogOpen({ commit, state }, dialogStatus) {
-    //     commit('SET_DIALOG', dialogStatus);
-    // }
+    getEvent: async function ({ commit }, payload) {
+        try {
+            const token = localStorage.getItem("token");
+            let event = await axios({
+                url: `http://localhost:3000/event/get?id=${payload}`,
+                method: "GET",
+                headers: {
+                    "auth-token": token,
+                },
+            });
+            commit('SET_SELECTED_EVENT', event.data.data);
+        } catch (error) {
+            console.log(error);
+        }
+    },
 }
 
 export default {

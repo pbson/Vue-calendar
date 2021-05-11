@@ -35,7 +35,6 @@ const actions = {
             commit('auth_request')
             axios({ url: 'http://localhost:3000/auth/login', data: user, method: 'POST' })
                 .then(resp => {
-                    console.log(resp);
                     const token = resp.data.token
                     const user = resp.data.user
                     localStorage.setItem('token', token)

@@ -1,27 +1,29 @@
 <template>
   <transition name="slide-fade">
-    <v-col v-if="isSidebarActive" cols="2">
-      <v-navigation-drawer class="drawerWrapper" v-model="isSidebarActive">
-        <v-row class="buttonWrapper">
+    <v-col v-show="getIsSidebarActive" cols="2">
+      <v-navigation-drawer class="drawerWrapper">
+        <v-row class="mb-5 buttonWrapper">
           <AddEventDialog />
         </v-row>
 
-        <v-row class="calendarPickerWrapper" justify="center">
+        <v-row class="mb-10 mt-10 calendarPickerWrapper" justify="center">
           <v-date-picker
             class="calendarPicker"
             v-model="picker"
             color="#059FFD"
             header-color="#059FFD"
+            @dblclick:date="dblClick"
+            no-title
           >
           </v-date-picker>
         </v-row>
 
         <v-row class="calendarListWrapper">
-          <h1>Calendar list</h1>
+          <h1 class="font-weight-regular">Calendar list</h1>
           <AddCalendarDialog />
         </v-row>
         <br />
-        <CalendarListItem v-bind:calendarList="calendarList"/>
+        <CalendarListItem v-bind:calendarList="getSidebarCalendarList" />
       </v-navigation-drawer>
     </v-col>
   </transition>
@@ -75,43 +77,38 @@ import CalendarListItem from "../components/CalendarListItem";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
+  props: {
+    events: Array,
+  },
   components: {
     AddEventDialog: AddEventDialog,
     AddCalendarDialog: AddCalendarDialog,
     CalendarListItem: CalendarListItem,
   },
   computed: {
-    ...mapGetters(["getCalendarList","getSidebarCalendarList"]),
-    isSidebarActive() {
-      return this.$store.state.isSidebarActive;
+    ...mapGetters(["getSidebarCalendarList", "getIsSidebarActive"]),
+    calendarList() {
+      return this.getSidebarCalendarList;
     },
-    calendarList(){
-      return this.getSidebarCalendarList
-    }
-  },
-  watch: {
-    calendarList(){
-      return this.getSidebarCalendarList
-    }
   },
   data() {
     return {
-      // drawer: false,
+      isSidebarActive: false,
       picker: new Date().toISOString().substr(0, 10),
-      items: [
-        { title: "Home", icon: "mdi-home-city" },
-        { title: "My Account", icon: "mdi-account" },
-        { title: "Users", icon: "mdi-account-group-outline" },
-      ],
     };
   },
   methods: {
-    ...mapActions(['addCalendarList']),
+    ...mapActions(["addCalendarList", "setIsSidebarActive"]),
+    dblClick(date) {
+      this.$set(this.done, 0, true);
+
+      alert(`You have just double clicked the following date: ${date}`);
+    },
   },
   async created() {
-    if (!this.getCalendarList) {
-      await this.addCalendarList();
-    }
-  }
+    // if (!this.getCalendarList) {
+    await this.addCalendarList();
+    // }
+  },
 };
 </script>

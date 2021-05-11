@@ -1,5 +1,5 @@
 <template>
-  <v-row class="fill-height pt-0 overflow-y-auto">
+  <v-row class="fill-height mt-5 pt-0 overflow-y-auto">
     <v-col cols="2">
       <h2>Select settings</h2>
       <v-list dense>
@@ -15,7 +15,7 @@
         </v-list-item>
       </v-list>
     </v-col>
-    <v-col lg="6" class="pt-0">
+    <v-col lg="6" class="mt-5 pt-0">
       <v-sheet height="64">
         <h2>Change password</h2>
         <div>
@@ -23,7 +23,6 @@
             <v-row class="d-flex flex-column">
               <b></b>
               <v-row>
-                <h2>Change password</h2>
                 <v-col cols="12">
                   <v-text-field
                     prepend-icon="mdi-form-textbox-password"
