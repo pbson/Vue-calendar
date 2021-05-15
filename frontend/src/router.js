@@ -2,17 +2,25 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import store from './store/store.js'
+
 import Home from './views/user/Home.vue'
 import Login from './views/Login.vue'
-import Secure from './components/Secure.vue'
 import Register from './views/Register.vue'
+
 import Calendar from './views/user/Calendar.vue'
 import CalendarSettings from './views/user/CalendarSettings.vue'
 import UserSettings from './views/user/UserSettings.vue'
 import ChangePassword from './views/user/ChangePassword.vue'
 import CalendarSearch from './views/user/CalendarSearch.vue'
+
+import User from './views/admin/User.vue'
+import Subject from './views/admin/Subject.vue'
+import Faculty from './views/admin/Faculty.vue'
+
 import AppBar from './components/AppBar.vue'
 import Header from './components/Header.vue'
+import AdminHeader from './components/AdminHeader.vue'
+
 
 Vue.use(Router)
 
@@ -75,12 +83,28 @@ let router = new Router({
       component: Register
     },
     {
-      path: '/secure',
-      name: 'secure',
-      component: Secure,
-      meta: { 
-        requiresAuth: true
-      }
+      path: '/admin/user',
+      name: 'userManagement',
+      components: {
+        default:User,
+        header:AdminHeader
+      },
+    },
+    {
+      path: '/admin/subject',
+      name: 'subjectManagement',
+      components: {
+        default:Subject,
+        header:AdminHeader
+      },
+    },
+    {
+      path: '/admin/faculty',
+      name: 'facultyManagement',
+      components: {
+        default:Faculty,
+        header:AdminHeader
+      },
     }
   ]
 })

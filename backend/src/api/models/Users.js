@@ -1,5 +1,7 @@
 import { Schema, model } from 'mongoose';
 import timestamps  from 'mongoose-timestamp';
+import Faculty from './Faculties';
+import Role from './Roles'
 
 const userSchema = new Schema({
     Name:{
@@ -22,11 +24,11 @@ const userSchema = new Schema({
     },
     Role: { 
         type: Schema.Types.ObjectId, 
-        ref: 'Roles' 
+        ref: Role
     },
     Faculty: { 
         type: Schema.Types.ObjectId, 
-        ref: 'Faculty' 
+        ref: Faculty 
     },
     Avatar:{
         type: String,

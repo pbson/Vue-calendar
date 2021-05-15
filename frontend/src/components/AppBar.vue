@@ -1,17 +1,17 @@
 <template>
   <div>
     <v-app-bar class="appBar" elevation="0">
-      <v-app-bar-nav-icon @click="setIsSidebarActive(!getIsSidebarActive)"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon color="white" @click="setIsSidebarActive(!getIsSidebarActive)"></v-app-bar-nav-icon>
       <v-spacer></v-spacer>
 
       <v-btn @click.native="$router.push('/calendar-search')" icon>
-        <v-icon>mdi-magnify</v-icon>
+        <v-icon color="white">mdi-magnify</v-icon>
       </v-btn>
       <v-btn @click.native="$router.push('/user-settings')" icon>
-        <v-icon>mdi-account</v-icon>
+        <v-icon color="white">mdi-account</v-icon>
       </v-btn>
       <v-btn @click="logout" icon>
-        <v-icon>mdi-power</v-icon>
+        <v-icon color="white">mdi-power</v-icon>
       </v-btn>
     </v-app-bar>
   </div>
@@ -19,7 +19,7 @@
 
 <style scoped lang="scss">
 .appBar {
-  background-color: white !important;
+  background-color: rgb(5,159,253) !important;
   border-bottom: 1px solid rgb(204, 204, 204) !important;
 }
 </style>

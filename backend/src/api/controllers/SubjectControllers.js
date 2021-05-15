@@ -23,14 +23,12 @@ export default {
                         msg: 'Faculty not found'
                     })
             } else {
+                console.log(req.body)
                 let subject = new Subject();
-                subject.SubjectName = req.body.subjectName;
-                subject.SubjectCode = req.body.subjectCode;
+                subject.SubjectName = req.body.name;
+                subject.SubjectCode = req.body.code;
                 subject.FacultyId = req.body.facultyId;
                 subject.save();
-
-                faculty.Subjects.push(subject._id)
-                faculty.save();
 
                 return res
                     .status(200)
@@ -50,7 +48,7 @@ export default {
     },
     update: async function (req, res) {
         try {
-            if (!isId(req.body.facultyId) || !isId(req.body.id)) {
+            if (!isId(req.body.facultyId)) {
                 return res
                     .status(404)
                     .json({
@@ -58,7 +56,7 @@ export default {
                     })
             }
             let faculty = await Faculty.findOne({ _id: req.body.facultyId })
-            let subject = await Subject.findById({ _id: req.body.id })
+            let subject = await Subject.findById({ _id: req.query.id })
             if (!faculty) {
                 return res
                     .status(404)
@@ -74,13 +72,10 @@ export default {
                         msg: 'Subject not found'
                     })
             } else {
-                subject.SubjectName = req.body.subjectName;
-                subject.SubjectCode = req.body.subjectCode;
+                subject.SubjectName = req.body.name;
+                subject.SubjectCode = req.body.code;
                 subject.FacultyId = req.body.facultyId;
                 subject.save();
-
-                faculty.Subjects.push(subject._id)
-                faculty.save();
 
                 return res
                     .status(200)
@@ -98,12 +93,36 @@ export default {
                 })
         }
     },
+    delete: async function (req, res) {
+        try {
+            let subject = await Subject.findByIdAndRemove({ _id: req.query.id })
+            if (subject) {
+                return res
+                    .status(200)
+                    .json({
+                        status: 'OK'
+                    })
+            } else {
+                return res
+                    .status(404)
+                    .json({
+                        status: 'Not found',
+                    })
+            }
+        } catch (error) {
+            return res
+                .status(400)
+                .json({
+                    status: 'Bad request',
+                })
+        }
+    },
     getAll: async function (req, res) {
         try {
-            const page = parseInt(req.body.page)
-            const limit = parseInt(req.body.limit)
+            const page = parseInt(req.query.page)
+            const limit = parseInt(req.query.limit)
 
-            let subject = await Subject.find({FacultyId: req.body.facultyId}).sort({ updatedAt: 1 }).skip((page - 1) * limit).limit(limit)
+            let subject = await Subject.find({}).sort({ updatedAt: 1 }).skip((page - 1) * limit).limit(limit).populate('FacultyId')
 
             if (subject) {
                 return res

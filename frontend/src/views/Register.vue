@@ -64,6 +64,18 @@
             dense
             required
           ></v-text-field>
+
+          <v-select
+            v-model="selectFaculty"
+            :items="faculties"
+            item-text="FacultyName"
+            item-value="_id"
+            prepend-icon="home"
+            label="Solo field"
+            filled
+            rounded
+            dense
+          ></v-select>
           <v-btn
             class="main__submit-button mt-10"
             elevation="0"
@@ -113,11 +125,13 @@ import axios from "axios";
 export default {
   data() {
     return {
+      selectFaculty: "",
       name: "",
       email: "",
       password: "",
       password_confirmation: "",
       valid: true,
+      faculties: [],
       nameRules: [
         (v) => !!v || "Name is required",
         (v) => (v && v.length <= 10) || "Name must be less than 10 characters",
@@ -199,6 +213,7 @@ export default {
         name: this.name,
         email: this.email,
         password: this.password,
+        faculty: this.selectFaculty,
       };
       try {
         await this.$store.dispatch("register", data);
@@ -208,13 +223,25 @@ export default {
         console.log(error);
       }
       (this.name = ""),
-        (this.email = ""),
-        (this.password = ""),
-        (this.password_confirmation = "");
+      (this.email = ""),
+      (this.password = ""),
+      (this.password_confirmation = "");
+      (this.faculty = "");
     },
     reset() {
       this.$refs.form.reset();
     },
+  },
+  created: async function() {
+    try {
+      let resp = await axios({
+        url: "http://localhost:3000/faculty/getall?page=1&limit=20",
+        method: "GET",
+      });
+      this.faculties = resp.data.data;
+    } catch (error) {
+      console.log(error);
+    }
   },
 };
 </script>
