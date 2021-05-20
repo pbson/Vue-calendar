@@ -1,9 +1,6 @@
 <template>
   <div>
     <v-app-bar class="appBar" elevation="0">
-      <v-app-bar-nav-icon @click.native="$router.go(-1)">
-        <v-icon color="white">mdi-keyboard-backspace</v-icon>
-      </v-app-bar-nav-icon>
       <v-title class="title">Calendar Admin</v-title>
     </v-app-bar>
   </div>

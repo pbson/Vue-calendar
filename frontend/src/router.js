@@ -4,8 +4,8 @@ import Router from 'vue-router'
 import store from './store/store.js'
 
 import Home from './views/user/Home.vue'
-import Login from './views/Login.vue'
-import Register from './views/Register.vue'
+import Login from './views/user/Login.vue'
+import Register from './views/user/Register.vue'
 
 import Calendar from './views/user/Calendar.vue'
 import CalendarSettings from './views/user/CalendarSettings.vue'
@@ -16,6 +16,11 @@ import CalendarSearch from './views/user/CalendarSearch.vue'
 import User from './views/admin/User.vue'
 import Subject from './views/admin/Subject.vue'
 import Faculty from './views/admin/Faculty.vue'
+
+import MinistryCalendar from './views/ministry/Calendar.vue'
+import MinistryActivities from './views/ministry/Activities.vue'
+import MinistryLogin from './views/ministry/Login.vue'
+import MinistryRegister from './views/ministry/Register.vue'
 
 import AppBar from './components/AppBar.vue'
 import Header from './components/Header.vue'
@@ -104,6 +109,36 @@ let router = new Router({
       components: {
         default:Faculty,
         header:AdminHeader
+      },
+    },
+    {
+      path: '/ministry/calendar',
+      name: 'ministryCalendar',
+      components: {
+        default:MinistryCalendar,
+        header:AdminHeader
+      },
+    },
+    {
+      path: '/ministry/activities',
+      name: 'MinistryActivities',
+      components: {
+        default:MinistryActivities,
+        header:AdminHeader
+      },
+    },
+    {
+      path: '/ministry/register',
+      name: 'MinistryRegister',
+      components: {
+        default:MinistryRegister,
+      },
+    },
+    {
+      path: '/ministry/login',
+      name: 'MinistryLogin',
+      components: {
+        default:MinistryLogin,
       },
     }
   ]

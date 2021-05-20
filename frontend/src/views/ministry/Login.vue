@@ -13,7 +13,7 @@
           Discover the world’s top Designers & Creatives.
         </h2>
         <v-img
-          src="../assets/vector-creator.png"
+          src="../../assets/vector-creator.png"
           max-width="500"
           max-height="500"
         >
@@ -101,7 +101,7 @@ export default {
       let password = this.password;
       this.$store
         .dispatch("login", { email, password })
-        .then(() => this.$router.push("/calendar"))
+        .then(() => this.$router.push("/ministry/calendar"))
         .catch((err) => console.log(err));
     },
     validate() {

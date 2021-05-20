@@ -30,10 +30,6 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId, 
         ref: Faculty 
     },
-    Avatar:{
-        type: String,
-        // required: true,
-    },
     CalendarLists:[{ type: Schema.Types.ObjectId, ref: 'CalendarEntries' }]
 })
 userSchema.plugin(timestamps);

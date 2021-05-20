@@ -74,7 +74,7 @@ export default {
   methods: {
     exportCalendar: async function(id) {
       try {
-        window.open(`http://localhost:3000/base-calendar/get-events?id=${id}`);
+        window.open(`http://localhost:3000/base-calendar/generate-ics?id=${id}`);
 
         // await axios({
         //   url: `http://localhost:3000/base-calendar/get-events?id=${id}`,

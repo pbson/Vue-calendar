@@ -5,9 +5,15 @@ let fs = require('fs');
 let path = require('path');
 
 export default {
-    get: async function (req, res) {
+    getAll: async function (req, res) {
         try {
-            let calendar = await BaseCalendar.findById({ _id: req.body.id })
+            let calendar = await BaseCalendar.find({ Owner: req.user._id })
+            .populate({
+                path: 'Events',
+                populate: {
+                    path: 'Attendees.UserId'
+                }
+            })
             if (calendar) {
                 return res
                     .status(200)
@@ -31,6 +37,30 @@ export default {
         }
     },
     getEvents: async function (req, res) {
+        try {
+            let calendar = await BaseCalendar.findOne({ Owner: req.user._id, CalendarTitle: 'Activities Calendar' })
+                .populate({
+                    path: 'Events',
+                    populate: {
+                        path: 'Attendees.UserId'
+                    }
+                })
+            return res
+                .status(200)
+                .json({
+                    status: 'OK',
+                    data: calendar
+                })
+        } catch (error) {
+            console.log(error)
+            return res
+                .status(400)
+                .json({
+                    status: 'Bad request',
+                })
+        }
+    },
+    generateIcs: async function (req, res) {
         try {
             let calendar = await BaseCalendar.findById({ _id: req.query.id })
                 .populate({
@@ -153,7 +183,7 @@ export default {
     },
     update: async function (req, res) {
         try {
-            let calendar = await BaseCalendar.findById({ _id: req.body.id })
+            let calendar = await BaseCalendar.findById({ _id: req.query.id })
             if (calendar) {
                 calendar.CalendarTitle = req.body.title;
                 calendar.CalendarDescription = req.body.description
@@ -183,7 +213,7 @@ export default {
     },
     delete: async function (req, res) {
         try {
-            let calendar = await BaseCalendar.findByIdAndRemove({ _id: req.body.id })
+            let calendar = await BaseCalendar.findByIdAndRemove({ _id: req.query.id })
             if (calendar) {
                 return res
                     .status(200)

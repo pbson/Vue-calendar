@@ -97,7 +97,7 @@
         <h2 class="sidepanel__secondary-text">
           Discover the world’s top Designers & Creatives.
         </h2>
-        <v-img src="../assets/register.png" max-width="500" max-height="500">
+        <v-img src="../../assets/register.png" max-width="500" max-height="500">
           <template v-slot:placeholder>
             <v-row class="fill-height ma-0" align="center" justify="center">
               <v-progress-circular
@@ -217,16 +217,18 @@ export default {
       };
       try {
         await this.$store.dispatch("register", data);
-        this.$router.push("/calendar");
         this.addCalendar();
+        setTimeout(() => {
+          this.$router.push("/calendar");
+        }, 0);
       } catch (error) {
         console.log(error);
       }
       (this.name = ""),
-      (this.email = ""),
-      (this.password = ""),
-      (this.password_confirmation = "");
-      (this.faculty = "");
+        (this.email = ""),
+        (this.password = ""),
+        (this.password_confirmation = "");
+      this.faculty = "";
     },
     reset() {
       this.$refs.form.reset();

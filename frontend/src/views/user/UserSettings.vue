@@ -31,12 +31,6 @@
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
-                  <v-file-input
-                    label="Avatar"
-                    prepend-icon="mdi-camera"
-                  ></v-file-input>
-                </v-col>
-                <v-col cols="12">
                   <v-select
                     prepend-icon="mdi-palette"
                     :items="['0-17', '18-29', '30-54', '54+']"

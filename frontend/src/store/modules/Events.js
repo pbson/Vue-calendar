@@ -59,6 +59,8 @@ function makeRecurringEvents(payload, focus) {
     let recurDates = rrulestr(payload.RecurrencePattern)
         .between(recurStart, recurEnd)
         .map((date) => format(DateTime.fromJSDate(date).toUTC().setZone('local', { keepLocalTime: true }).toJSDate(), 'yyyy-MM-dd'));
+    
+    console.log(payload.RecurrencePattern);
 
     for (let recurDate of recurDates) {
         let tmpObj = {

@@ -7,8 +7,9 @@ const router = Router();
 router.post("/add",verifyToken, controller.add );
 router.delete('/delete',verifyToken, controller.delete);
 router.put("/update",verifyToken, controller.update);
-router.post("/get",verifyToken, controller.get);
-router.get("/get-events", controller.getEvents)
+router.get("/getall",verifyToken, controller.getAll);
+router.get("/generate-ics", controller.generateIcs)
+router.get("/get-events",verifyToken, controller.getEvents)
 router.get("/search",verifyToken, controller.search)
 
 module.exports = router;

@@ -64,7 +64,7 @@ export default {
                 })
         }
     },
-    get: async function (req, res) { 
+    get: async function (req, res) {
         try {
             let event = await Event.findById({ _id: req.query.id })
             if (event) {
@@ -114,13 +114,14 @@ export default {
                 calendar.Events.push(event._id)
                 calendar.save();
 
-                let calEntries = await CalendarEntries.findOne({ _id: req.body.calEntriesId })
-                calEntries.Reminders.push({
-                    minute: req.body.minute,
-                    eventId: event._id
-                })
-                calEntries.save()
-
+                if (req.body.calEntriesId) {
+                    let calEntries = await CalendarEntries.findOne({ _id: req.body.calEntriesId })
+                    calEntries.Reminders.push({
+                        minute: req.body.minute,
+                        eventId: event._id
+                    })
+                    calEntries.save()
+                }
                 return res
                     .status(200)
                     .json({
@@ -284,10 +285,10 @@ export default {
         } catch (error) {
             console.log(error)
             return res
-            .status(404)
-            .json({
-                status: error
-            })
+                .status(404)
+                .json({
+                    status: error
+                })
         }
     }
 

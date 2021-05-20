@@ -197,15 +197,6 @@
                     required
                   ></v-select>
                 </v-col>
-                <!-- Select response status -->
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="responseStatus"
-                    prepend-icon="mdi-format-title"
-                    label="Response status*"
-                    required
-                  ></v-text-field>
-                </v-col>
               </v-row>
             </v-row>
             <v-row v-if="type == 'event'" class="d-flex flex-column pa-3 mt-4">
@@ -371,7 +362,7 @@ export default {
           endAt: this.toTime,
           onDay: this.fromDate,
           isRecurring: this.isRecurring,
-          responseStatus: this.responseStatus,
+          responseStatus: 'GOING',
           calendarId: this.selectCalendar.id,
           colorId: this.selectCalendar.color,
           minute: this.minute,

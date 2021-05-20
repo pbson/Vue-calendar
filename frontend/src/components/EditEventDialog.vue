@@ -266,7 +266,7 @@ export default {
       intervalValues: ["1", "2", "3", "4"],
       interval: null,
 
-      updateOptions: ["All", "One", "Every after"],
+      updateOptions: ["All", "Every after"],
       updateType: null,
 
       calendarList: [],

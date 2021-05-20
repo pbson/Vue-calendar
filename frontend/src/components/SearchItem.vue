@@ -61,32 +61,15 @@
                       item-value="id"
                       label="Color*"
                       required
-                    ></v-select>
+                    >
+                      <template slot="item" slot-scope="data">
+                        <!-- HTML that describe how select should render items when the select is open -->
+                        {{ data.item.name }}
+                        <br />
+                        <v-icon :color="data.item.name">mdi-circle </v-icon>
+                      </template>
+                    </v-select>
                   </v-col>
-                  <v-col cols="12" sm="6"> </v-col>
-                  <h2>Notifications before</h2>
-                  <v-row class="pa-3">
-                    <v-col cols="12" sm="6">
-                      <v-text-field
-                        v-model="time"
-                        prepend-icon="mdi-alarm"
-                        single-line
-                        type="number"
-                        label="30"
-                        required
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                      <v-text-field
-                        prepend-icon="mdi-alarm"
-                        single-line
-                        type="number"
-                        label="Minute"
-                        disabled
-                        required
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
                 </v-row>
               </v-container>
               <small>*indicates required field</small>
@@ -119,6 +102,7 @@
 <script>
 import axios from "axios";
 import { mapActions } from "vuex";
+import swal from 'sweetalert';
 
 export default {
   props: ["id", "title", "description", "owner", "rule"],
@@ -156,7 +140,6 @@ export default {
         let calendarEntries = {
           calendarId: this.id,
           colorId: this.selectColor,
-          time: this.time,
           isPrimary: false,
         };
         await axios({
@@ -169,6 +152,8 @@ export default {
         });
         this.addCalendarList();
         this.dialog = false;
+        swal("Subcribe successfully!", "Calendar list updated!", "success");
+        console.log('abc')
       } catch (error) {
         console.log(error);
       }
