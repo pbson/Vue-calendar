@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import timestamps  from 'mongoose-timestamp';
+import Faculty from './Faculties'
 
 const subjectsSchema = new Schema({
     SubjectName: {
@@ -12,7 +13,7 @@ const subjectsSchema = new Schema({
     },
     FacultyId: { 
         type: Schema.Types.ObjectId, 
-        ref: 'Faculties',
+        ref: Faculty,
         required: true
     },
 })

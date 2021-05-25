@@ -182,7 +182,6 @@ export default {
           method: "GET",
         });
         this.faculties = resp.data.data;
-        console.log(this.faculties);
       } catch (error) {
         console.log(error);
       }

@@ -204,7 +204,7 @@ export default {
     async initialize() {
       try {
         let resp = await axios({
-          url: "http://localhost:3000/auth/getall?page=1&limit=10",
+          url: "http://localhost:3000/auth/getall?page=1&limit=100",
           method: "GET",
         });
         this.users = resp.data.data;

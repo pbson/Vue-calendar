@@ -38,6 +38,9 @@ const actions = {
                     const token = resp.data.token
                     const user = resp.data.user
                     localStorage.setItem('token', token)
+                    localStorage.setItem('id', user._id)
+                    localStorage.setItem('role', user.Role)
+                    localStorage.setItem('faculty', user.Faculty)
                     axios.defaults.headers.common['auth-token'] = token
                     commit('auth_success', token, user)
                     resolve(resp)
@@ -56,6 +59,7 @@ const actions = {
             const token = resp.data.token
             const respUser = resp.data.user
             localStorage.setItem('token', token)
+            localStorage.setItem('id', respUser._id)
             axios.defaults.headers.common['auth-token'] = token
             commit('auth_success', token, respUser)
 

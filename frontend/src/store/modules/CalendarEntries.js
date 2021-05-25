@@ -19,7 +19,16 @@ const getters = {
         })
     },
     getEventDialogCalendarList: state => {
-        return state.calendarList.map(elem => {
+        console.log(state.calendarList)
+        let role = localStorage.getItem('role')
+        let filterList = state.calendarList.filter(ele=>{
+            if (ele.CalendarId.AccessRuleId == '607429737a1850bd9014fdfa' && role == '6071f3bb465293cd03744985'){
+                return;
+            }else{
+                return ele
+            }
+        })
+        return filterList.map(elem => {
             var obj = {}
             obj['id'] = elem.CalendarId._id
             obj['calEntriesId'] = elem._id

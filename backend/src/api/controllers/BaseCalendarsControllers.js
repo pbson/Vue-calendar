@@ -120,7 +120,6 @@ export default {
                                 if (err) {
                                     console.log(err);
                                 }
-                                console.log('FILE [' + filename + '] REMOVED!');
                             });
                         });
                     });

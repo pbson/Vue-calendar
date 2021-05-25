@@ -23,7 +23,6 @@ export default {
                         msg: 'Faculty not found'
                     })
             } else {
-                console.log(req.body)
                 let subject = new Subject();
                 subject.SubjectName = req.body.name;
                 subject.SubjectCode = req.body.code;
@@ -123,6 +122,33 @@ export default {
             const limit = parseInt(req.query.limit)
 
             let subject = await Subject.find({}).sort({ updatedAt: 1 }).skip((page - 1) * limit).limit(limit).populate('FacultyId')
+
+            if (subject) {
+                return res
+                    .status(200)
+                    .json({
+                        status: 'OK',
+                        data: subject
+                    })
+            } else {
+                return res
+                    .status(404)
+                    .json({
+                        status: 'Not found',
+                    })
+            }
+        } catch (error) {
+            return res
+                .status(400)
+                .json({
+                    status: 'Bad request',
+                })
+        }
+    },
+    getByFaculty: async function (req, res) {
+        try {
+            console.log(req.query.id)
+            let subject = await Subject.find({FacultyId: req.query.id})
 
             if (subject) {
                 return res

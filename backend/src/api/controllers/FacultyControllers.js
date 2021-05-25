@@ -73,8 +73,6 @@ export default {
             const page = parseInt(req.query.page)
             const limit = parseInt(req.query.limit)
 
-            console.log(page, limit)
-
             let faculty = await Faculty.find({}).populate('Subjects').sort({updatedAt: 1}).skip((page-1)*limit).limit(limit)
 
             if (faculty) {

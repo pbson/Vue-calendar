@@ -30,6 +30,7 @@ function createAllEvents(events, focus) {
                 name: item.EventTitle,
                 color: item.ColorId.EventMain,
                 textcolor: item.ColorId.EventSecondary,
+                type: item.Type,
                 description: item.EventDescription,
                 id: item._id,
                 baseCalendarId: item.BaseCalendarId._id,
@@ -38,7 +39,9 @@ function createAllEvents(events, focus) {
                 responseStatus: item.ResponseStatus,
                 reminder: item.minute,
                 category: item.Type,
-                attendees: item.Attendees
+                attendees: item.Attendees,
+                isComplete: item.IsComplete,
+                owner: item.Owner
             })
         }
     });
@@ -69,6 +72,7 @@ function makeRecurringEvents(payload, focus) {
             name: payload.EventTitle,
             color: payload.ColorId.EventSecondary,
             textcolor: payload.ColorId.EventSecondary,
+            type: payload.Type,
             description: payload.EventDescription,
             id: payload._id,
             baseCalendarId: payload.BaseCalendarId._id,
@@ -77,7 +81,9 @@ function makeRecurringEvents(payload, focus) {
             responseStatus: payload.ResponseStatus,
             reminder: payload.minute,
             category: payload.Type,
-            attendees: payload.Attendees
+            attendees: payload.Attendees,
+            isComplete: payload.IsComplete,
+            owner: payload.Owner
         };
         recurringEvents.push(tmpObj);
     }

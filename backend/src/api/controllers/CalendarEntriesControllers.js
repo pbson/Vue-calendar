@@ -129,7 +129,7 @@ export default {
             let color = await isDocumentExist(Color, req.body.colorId)
 
             if (user && color) {
-                let calendar = await CalendarEntries.findOne({ _id: req.body.id })
+                let calendar = await CalendarEntries.findOne({ _id: req.query.id })
                 calendar.ColorId = req.body.colorId;
                 calendar.save();
                 return res

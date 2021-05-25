@@ -28,6 +28,7 @@
                 small-chips
                 item-value="_id"
                 label="Search for user"
+                :rules="rule"
                 prepend-icon="mdi-account-multiple-plus"
               >
                 <template v-slot:no-data>
@@ -53,6 +54,7 @@
                 item-text="name"
                 item-value="id"
                 label="Access Rule*"
+                :rules="rule"
                 required
               ></v-select>
             </v-col>
@@ -62,6 +64,7 @@
                 v-model="subject"
                 prepend-icon=" mdi-fountain-pen-tip"
                 label="Subject*"
+                :rules="rule"
                 required
               ></v-text-field>
             </v-col>
@@ -70,6 +73,7 @@
                 v-model="message"
                 prepend-icon="mdi-square-edit-outline"
                 label="Message*"
+                :rules="rule"
                 required
               ></v-textarea>
             </v-col>
@@ -93,9 +97,10 @@
 <script>
 // import { mapGetters, mapActions } from "vuex";
 import axios from "axios";
+import swal from "sweetalert";
 
 export default {
-  props: ["eventId"],
+  props: ["eventId", "type"],
   data: () => ({
     rules: [],
     selectRule: null,
@@ -107,12 +112,12 @@ export default {
     message: "",
     debounce: null,
     dialog: false,
+    rule: [(v) => !!v || "Field is required"],
   }),
 
   watch: {
     search() {
       // if (this.items.length > 0) return;
-
       this.isLoading = true;
       if (this.debounce) {
         clearTimeout(this.debounce);
@@ -153,29 +158,33 @@ export default {
       }
     },
     async sendInvitation() {
-      let data = {
-        users: this.values,
-        subject: this.subject,
-        message: this.message,
-        eventId: this.eventId,
-        rule: this.selectRule
-      };
-      console.log(data);
-      const token = localStorage.getItem("token");
-      await axios({
-        url: `http://localhost:3000/auth/invite`,
-        method: "POST",
-        data: data,
-        headers: {
-          "auth-token": token,
-        },
-      });
+      if (this.values.length == 0 || !this.subject || !this.message || !this.selectRule) {
+        swal("Share error!", "Please check your input field", "error");
+      } else {
+        swal("Share successfully!", "Event has been shared!", "success");
+        let data = {
+          users: this.values,
+          subject: this.subject,
+          message: this.message,
+          eventId: this.eventId,
+          rule: this.selectRule,
+        };
+        const token = localStorage.getItem("token");
+        await axios({
+          url: `http://localhost:3000/auth/invite`,
+          method: "POST",
+          data: data,
+          headers: {
+            "auth-token": token,
+          },
+        });
+      }
     },
     closeDialog() {
       this.dialog = false;
-      setTimeout(() => {
-        location.reload();
-      }, 0);
+      // setTimeout(() => {
+      //   location.reload();
+      // }, 0);
     },
   },
   async created() {

@@ -89,11 +89,16 @@
           <v-card color="grey lighten-4" min-width="350px" flat>
             <v-toolbar class="elevation-0" :color="selectedEvent.color" dark>
               <EditEventDialog
+                v-if="isShow(selectedEvent)"
                 :eventId="selectedEvent.id"
                 :eventDate="selectedEvent.start"
               />
               <!-- delete dialog -->
-              <v-btn icon @click="showDeleteDialog()">
+              <v-btn
+                v-if="isShow(selectedEvent)"
+                icon
+                @click="showDeleteDialog()"
+              >
                 <v-icon>mdi-trash-can</v-icon>
               </v-btn>
               <v-dialog v-model="dialogDelete" max-width="500px">
@@ -117,7 +122,29 @@
                 </v-card>
               </v-dialog>
               <!--end delete dialog -->
-              <ShareEventDialog :eventId="selectedEvent.id" />
+              <ShareEventDialog
+                v-if="selectedEvent.type == 'event' && isShow(selectedEvent)"
+                :eventId="selectedEvent.id"
+              />
+              <v-btn
+                v-if="selectedEvent.type == 'task'"
+                style="margin-left: 10px"
+                :value="selectedEvent.isComplete"
+                :label="`${selectedEvent.isComplete}`"
+                @click="setTask(selectedEvent)"
+                color="primary"
+              >
+                {{ selectedEvent.isComplete ? "completed" : "incomplete" }}
+              </v-btn>
+              <!-- <v-checkbox
+                v-if="selectedEvent.type == 'task'"
+                style="transform:translateY(11px); margin-left: 10px"
+                @click="setTask(selectedEvent)"
+                value="selectedEvent.isComplete"
+                rounded
+                small
+              >
+              </v-checkbox> -->
             </v-toolbar>
             <v-card-text class="elevation-0">
               <v-row class="d-flex flex-row align-start justify-start">
@@ -181,6 +208,7 @@ import axios from "axios";
 import lunar from "lunar";
 const schedule = require("node-schedule");
 let moment = require("moment");
+import swal from "sweetalert";
 
 export default {
   components: {
@@ -218,6 +246,21 @@ export default {
       this.focus = date;
       this.type = "day";
     },
+    isShow: function(payload) {
+      const id = localStorage.getItem("id");
+      if (id == payload.owner) {
+        return true;
+      } else if (!payload.attendees) {
+        return false;
+      } else {
+        let user = payload.attendees.find((el) => el.UserId._id === id);
+        if (user && user.AccessRuleId == "607428fa7a1850bd9014fdf8") {
+          return false;
+        } else if (user && user.AccessRuleId == "607429067a1850bd9014fdf9") {
+          return true;
+        }
+      }
+    },
     async getEvents() {
       try {
         await this.initInstances({
@@ -247,14 +290,12 @@ export default {
           this.selectedOpen = true;
         }, 10);
       };
-
       if (this.selectedOpen) {
         this.selectedOpen = false;
         setTimeout(open, 10);
       } else {
         open();
       }
-
       nativeEvent.stopPropagation();
     },
     deleteItem: async function(id) {
@@ -313,6 +354,30 @@ export default {
       new Notification(payload.title, {
         body: payload.body,
       });
+    },
+    setTask: async function(task) {
+      try {
+        const token = localStorage.getItem("token");
+        let data = {
+          isComplete: !task.isComplete,
+        };
+        await axios({
+          url: `http://localhost:3000/event/update?id=${task.id}`,
+          data: data,
+          method: "POST",
+          headers: {
+            "auth-token": token,
+          },
+        });
+        await this.initInstances({
+          focus: this.focus,
+        });
+        this.events = this.getInstances;
+        this.selectedOpen = false;
+        swal("Change successfully!", "Updated!", "success");
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
   async mounted() {

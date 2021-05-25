@@ -65,21 +65,37 @@
                   </v-card-title>
 
                   <v-card-text>
-                    <!-- Event title -->
-                    <v-col cols="12">
-                      <v-text-field
-                        v-model="title"
-                        prepend-icon="mdi-format-title"
-                        label="Title*"
-                        required
-                      ></v-text-field>
-                    </v-col>
+                    <v-row class="pl-3">
+                      <!-- Select subject -->
+                      <v-col cols="6" sm="6">
+                        <v-select
+                          :items="subjectList"
+                          item-text="SubjectCode"
+                          v-model="selectSubject"
+                          item-value="SubjectCode"
+                          label="Subject*"
+                          prepend-icon="mdi-school"
+                          required
+                        ></v-select>
+                      </v-col>
+                      <!-- Select teacher -->
+                      <v-col cols="6" sm="6">
+                        <v-select
+                          :items="teacherList"
+                          item-text="Name"
+                          v-model="selectTeacher"
+                          item-value="Name"
+                          label="Teacher*"
+                          required
+                        ></v-select>
+                      </v-col>
+                    </v-row>
                     <!-- Event description -->
                     <v-col cols="12">
                       <v-textarea
                         v-model="description"
                         prepend-icon="mdi-square-edit-outline"
-                        label="Description*"
+                        label="Extra Note*"
                         required
                       ></v-textarea>
                     </v-col>
@@ -194,18 +210,19 @@
 
                     <v-row class="pa-3 mt-0" v-if="isRecurring">
                       <!-- Recurring date -->
-                      <v-col cols="4">
+                      <v-col cols="6">
                         <v-select
                           v-model="length"
                           :items="lengthOption"
                           label="Subject week span"
                           hint="Subject will last for this number of weeks"
                           persistent-hint
+                          prepend-icon=" mdi-view-week"
                           chips
                         ></v-select>
                       </v-col>
                       <!-- Recurring interval -->
-                      <v-col cols="4">
+                      <v-col cols="6">
                         <v-select
                           multiple
                           v-model="exclude"
@@ -268,12 +285,16 @@
 
 <script>
 import axios from "axios";
-import { RRule,RRuleSet } from "rrule";
+import { RRule, RRuleSet } from "rrule";
 
 export default {
   name: "ministryCalendarManagement",
   data() {
     return {
+      subjectList: [],
+      teacherList: [],
+      selectSubject: "",
+      selectTeacher: "",
       calendar: null,
       events: [],
       isAddItem: false,
@@ -307,7 +328,7 @@ export default {
       toTime: null,
 
       lengthOption: [8, 16],
-      length: 16,
+      length: null,
 
       // intervalValues: new Array(this.length),
       exclude: null,
@@ -345,6 +366,40 @@ export default {
   },
 
   methods: {
+    async getSubject() {
+      try {
+        const token = localStorage.getItem("token");
+        const faculty = localStorage.getItem("faculty");
+
+        let resp = await axios({
+          url: `http://localhost:3000/subject/getbyfaculty?id=${faculty}`,
+          method: "GET",
+          headers: {
+            "auth-token": token,
+          },
+        });
+        this.subjectList = resp.data.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getTeacher() {
+      try {
+        const token = localStorage.getItem("token");
+        const faculty = localStorage.getItem("faculty");
+
+        let resp = await axios({
+          url: `http://localhost:3000/auth/get?faculty=${faculty}`,
+          method: "GET",
+          headers: {
+            "auth-token": token,
+          },
+        });
+        this.teacherList = resp.data.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async initialize() {
       try {
         const token = localStorage.getItem("token");
@@ -371,9 +426,10 @@ export default {
     createRRULEString: function(payload) {
       let startDay = payload.startDate;
       let start = new Date(startDay);
-      console.log(this.length)
       let end = new Date(
-        new Date(startDay).setDate(new Date(startDay).getDate() + (Number(this.length)-1) * 7)
+        new Date(startDay).setDate(
+          new Date(startDay).getDate() + (Number(this.length) - 1) * 7
+        )
       );
 
       const rruleSet = new RRuleSet();
@@ -395,29 +451,12 @@ export default {
 
       return rruleSet.toString();
     },
-    // resetField: function() {
-    //   this.isRecurring = false;
-    //   this.title = "";
-    //   this.description = "";
-    //   this.fromDateMenu = false;
-    //   this.fromDate = null;
-    //   this.fromTimeMenu = false;
-    //   this.fromTime = null;
-    //   this.toTimeMenu = false;
-    //   this.toTime = null;
-    //   this.recurringDay = [];
-    //   this.interval = null;
-    //   this.selectCalendar = null;
-    //   this.responseStatus = null;
-    //   this.minute = 0;
-    // },
     sendAddEventApi: async function(event) {
       try {
         const token = localStorage.getItem("token");
         let recurrencePattern = await this.createRRULEString({
           startDate: event.onDay,
         });
-        console.log(recurrencePattern)
         event["recurrencePattern"] = recurrencePattern;
 
         if (this.isAddItem == true) {
@@ -476,15 +515,15 @@ export default {
 
     save: async function() {
       let calendar = await this.sendAddCalendarApi({
-        title: this.title,
-        description: this.description,
+        title: `${this.selectSubject}`,
+        description: `${this.selectSubject} - ${this.selectTeacher} - ${this.description}`,
         events: [],
         isHidden: false,
         accessRuleId: "607429737a1850bd9014fdfa",
       });
       this.sendAddEventApi({
-        title: this.title,
-        description: this.description,
+        title: `${this.selectSubject}`,
+        description: `${this.selectSubject} - ${this.selectTeacher} - ${this.description}`,
         startAt: this.fromTime,
         endAt: this.toTime,
         onDay: this.fromDate,
@@ -500,6 +539,12 @@ export default {
         this.isAddItem = false;
         this.close();
       }, 200);
+      this.selectSubject = "";
+      this.selectTeacher = "";
+      this.fromTime = null;
+      this.toTime = null;
+      this.fromDate = null;
+      this.length = null
     },
 
     editItem(item) {
@@ -552,6 +597,8 @@ export default {
 
   async created() {
     this.initialize();
+    this.getSubject();
+    this.getTeacher();
   },
 };
 </script>

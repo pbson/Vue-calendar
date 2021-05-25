@@ -163,12 +163,11 @@ export default {
                     IsComplete: req.body.isComplete
                 };
                 for (const [key, value] of Object.entries(fieldToUpdate)) {
-                    if (!value) {
+                    if (value==null) {
                         delete fieldToUpdate[key];
                     }
                 }
                 let event = await Event.findOneAndUpdate({ _id: req.query.id }, { $set: { ...fieldToUpdate } }, { new: true });
-
                 event.save();
 
                 return res

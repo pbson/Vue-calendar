@@ -310,7 +310,6 @@ export default {
         interval: this.interval,
         // dtstart: new Date(Date.UTC(year, monthUTC, day, hour, minutes)),
       });
-      console.log(rule.toString())
       return rule.toString().substring(6);
     },
     resetField: function() {

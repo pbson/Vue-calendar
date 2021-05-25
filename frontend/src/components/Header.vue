@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-app-bar class="appBar" elevation="0">
-      <v-app-bar-nav-icon @click.native="$router.go(-1)">
+      <v-app-bar-nav-icon @click.native="$router.push('/calendar')">
         <v-icon>mdi-keyboard-backspace</v-icon>
       </v-app-bar-nav-icon>
       <v-spacer></v-spacer>

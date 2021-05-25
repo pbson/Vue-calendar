@@ -153,7 +153,6 @@ export default {
         this.addCalendarList();
         this.dialog = false;
         swal("Subcribe successfully!", "Calendar list updated!", "success");
-        console.log('abc')
       } catch (error) {
         console.log(error);
       }

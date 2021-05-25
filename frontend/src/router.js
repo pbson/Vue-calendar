@@ -16,6 +16,7 @@ import CalendarSearch from './views/user/CalendarSearch.vue'
 import User from './views/admin/User.vue'
 import Subject from './views/admin/Subject.vue'
 import Faculty from './views/admin/Faculty.vue'
+import AdminLogin from './views/admin/Login.vue'
 
 import MinistryCalendar from './views/ministry/Calendar.vue'
 import MinistryActivities from './views/ministry/Activities.vue'
@@ -86,6 +87,13 @@ let router = new Router({
       path: '/register',
       name: 'register',
       component: Register
+    },
+    {
+      path: '/admin/login',
+      name: 'AdminLogin',
+      components: {
+        default:AdminLogin,
+      },
     },
     {
       path: '/admin/user',

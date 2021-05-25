@@ -37,7 +37,6 @@ export default {
       });
 
       const savedUser = await user.save();
-      console.log(savedUser)
 
       //Create and sign Token
       const token = jwt.sign({ _id: savedUser._id }, process.env.jwtSecret, { expiresIn: 86400 });
@@ -102,10 +101,78 @@ export default {
       }
       //Create and sign Token
       const token = jwt.sign({ _id: findUser._id, email: findUser.email }, process.env.jwtSecret);
-      console.log(token)
       res.status(200).header('auth-token', token).send({ auth: true, token: token, user: findUser });
     } catch {
       res.status(400).send(error);
+    }
+  },
+  changePassword: async function (req, res) {
+    const { currentPassword, newPassword } = req.body;
+    let user = await User.findOne({ _id: req.query.id })
+
+    bcrypt.compare(req.body.currentPassword, user.Password, async function (err, result) {
+      if (err) {
+        console.log(err)
+        return res
+          .status(400)
+          .json({
+            status: 'Error',
+          })
+      }
+      if (result) {
+        const salt = await bcrypt.genSalt(10);
+        const hashPassword = await bcrypt.hash(req.body.newPassword, salt);
+        User.updateOne({ _id: req.query.id }, { Password: hashPassword })
+        return res
+          .status(200)
+          .json({
+            status: 'Successful',
+          })
+      } else {
+        return res
+          .status(200)
+          .json({
+            status: 'Password does not match',
+          })
+      }
+    })
+  },
+  get: async function (req, res) {
+    try {
+      let user;
+      if (req.query.faculty) {
+        user = await User.find({ Faculty: req.query.faculty, Role: '6071f3b6465293cd03744984' })
+          .select('Name Email')
+          .populate('Faculty', 'FacultyName')
+          .populate('Role', 'RoleName')
+      } else {
+        user = await User.findOne({ _id: req.query.id })
+          .select('Name Email')
+          .populate('Faculty', 'FacultyName')
+          .populate('Role', 'RoleName')
+      }
+
+      if (user) {
+        return res
+          .status(200)
+          .json({
+            status: 'OK',
+            data: user
+          })
+      } else {
+        return res
+          .status(404)
+          .json({
+            status: 'Not found',
+          })
+      }
+    } catch (error) {
+      console.log(error)
+      return res
+        .status(400)
+        .json({
+          status: 'Bad request',
+        })
     }
   },
   getAll: async function (req, res) {
@@ -201,6 +268,25 @@ export default {
             status: 'OK'
           })
       }
+    } catch (error) {
+      console.log(error)
+      return res
+        .status(400)
+        .json({
+          status: 'Bad request',
+        })
+    }
+  },
+  updateCalendarlist: async function (req, res) {
+    try {
+      let user = await User.updateOne({ _id: req.user._id }, { $pull: { CalendarLists: req.query.id } })
+
+      return res
+        .status(200)
+        .json({
+          data: user,
+          status: 'OK'
+        })
     } catch (error) {
       console.log(error)
       return res

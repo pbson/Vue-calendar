@@ -37,6 +37,7 @@
                     label="Calendar Title*"
                     v-model="title"
                     required
+                    :disabled="Owner != user"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
@@ -44,6 +45,7 @@
                     prepend-icon="mdi-square-edit-outline"
                     label="Calendar Description*"
                     v-model="description"
+                    :disabled="Owner != user"
                     required
                   ></v-textarea>
                 </v-col>
@@ -55,6 +57,7 @@
                     v-model="selectColor"
                     item-value="id"
                     label="Color*"
+                    :disabled="Owner != user"
                     required
                   ></v-select>
                 </v-col>
@@ -68,6 +71,7 @@
                       :items="['Public', 'Private']"
                       v-model="selectPrivacy"
                       label="Privacy"
+                      :disabled="Owner != user"
                       required
                     ></v-select>
                   </v-col>
@@ -80,6 +84,7 @@
                       item-text="name"
                       item-value="id"
                       label="Access Rule*"
+                      :disabled="Owner != user"
                       required
                     ></v-select>
                   </v-col>
@@ -118,13 +123,38 @@
                   </v-btn>
                 </v-row>
               </v-row> -->
-              <v-row class="mt-5 justify-start flex-column" v-show="!isPrimary">
+              <v-row
+                class="mt-5 justify-start flex-column"
+                v-show="!isPrimary && user == Owner"
+              >
                 <h2 class="align-self-start">Delete Calendar</h2>
                 <p class="align-self-start">
-                  Notice: All your calendar will be deleted and can't be recovered
+                  Notice: All your calendar will be deleted and can't be
+                  recovered
                 </p>
-                <v-btn color="red" class="ma-2 white--text align-self-start">
+                <v-btn
+                  @click="deleteCalendar()"
+                  color="red"
+                  class="ma-2 white--text align-self-start"
+                >
                   Delete
+                  <v-icon right dark> mdi-trash-can </v-icon>
+                </v-btn>
+              </v-row>
+              <v-row
+                class="mt-5 justify-start flex-column"
+                v-show="user != Owner"
+              >
+                <h2 class="align-self-start">Unsubcribe Calendar</h2>
+                <p class="align-self-start">
+                  Notice: You will unsubcribe from this calendar
+                </p>
+                <v-btn
+                  @click="unsubcribeCalendar()"
+                  color="red"
+                  class="ma-2 white--text align-self-start"
+                >
+                  Unsubcribe
                   <v-icon right dark> mdi-trash-can </v-icon>
                 </v-btn>
               </v-row>
@@ -136,7 +166,7 @@
     <v-card-text>
       <v-fab-transition>
         <v-btn
-          @click="updateCalendar"
+          @click="updateCalendar()"
           color="primary"
           class="floatingButton"
           dark
@@ -157,7 +187,7 @@
           absolute
           top
           right
-          @click="updateCalendar"
+          @click="updateCalendar()"
         >
           Save changes
           <v-icon right dark> mdi-content-save </v-icon>
@@ -170,6 +200,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import axios from "axios";
+import swal from "sweetalert";
 
 export default {
   data() {
@@ -184,6 +215,8 @@ export default {
       selectRule: null,
       selectPrivacy: null,
       isPrimary: null,
+      owner: null,
+      user: null,
     };
   },
   computed: {
@@ -201,7 +234,7 @@ export default {
             "auth-token": token,
           },
         });
-        return resp.data.data.map(function (elem) {
+        return resp.data.data.map(function(elem) {
           let obj = {};
           obj["id"] = elem._id;
           obj["name"] = elem.CalendarMain;
@@ -221,7 +254,7 @@ export default {
             "auth-token": token,
           },
         });
-        return resp.data.data.map(function (elem) {
+        return resp.data.data.map(function(elem) {
           let obj = {};
           obj["id"] = elem._id;
           obj["name"] = elem.AccessName;
@@ -231,7 +264,7 @@ export default {
         console.log(error);
       }
     },
-    getCalendar: async function (calendarId) {
+    getCalendar: async function(calendarId) {
       const token = localStorage.getItem("token");
       try {
         let resp = await axios({
@@ -248,25 +281,27 @@ export default {
         this.description = resp.data.data.CalendarId.CalendarDescription;
         this.selectColor = resp.data.data.ColorId._id;
         this.selectRule = resp.data.data.CalendarId.AccessRuleId;
-        this.selectPrivacy = resp.data.data.CalendarId.isHidden ? "Private" : "Public";
+        this.selectPrivacy = resp.data.data.CalendarId.isHidden
+          ? "Private"
+          : "Public";
         this.isPrimary = resp.data.data.isPrimary;
+        this.Owner = resp.data.data.CalendarId.Owner;
         // console.log(this.baseCalendarId, this.calendarId)
       } catch (error) {
         console.log(error);
       }
     },
-    updateCalendar: async function () {
+    updateCalendar: async function() {
       try {
         const token = localStorage.getItem("token");
         let baseCalendar = {
-          id: this.baseCalendarId,
           title: this.title,
           description: this.description,
           accessRuleId: this.selectRule,
           isHidden: this.selectPrivacy == "Public" ? false : true,
         };
         await axios({
-          url: "http://localhost:3000/base-calendar/update",
+          url: `http://localhost:3000/base-calendar/update?id=${this.baseCalendarId}`,
           data: baseCalendar,
           method: "PUT",
           headers: {
@@ -274,24 +309,65 @@ export default {
           },
         });
         let calendarEntries = {
-          id: this.calendarId,
           colorId: this.selectColor,
           time: this.time,
         };
         await axios({
-          url: "http://localhost:3000/calendar-entries/update",
+          url: `http://localhost:3000/calendar-entries/update?id=${this.calendarId}`,
           data: calendarEntries,
           method: "PUT",
           headers: {
             "auth-token": token,
           },
         });
+        await this.addCalendarList();
+        this.calendarList = this.getSidebarCalendarList;
+        swal("Update successfully!", "Calendar list updated", "success");
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    deleteCalendar: async function() {
+      try {
+        const token = localStorage.getItem("token");
+        await axios({
+          url: `http://localhost:3000/base-calendar/delete?id=${this.baseCalendarId}`,
+          method: "DELETE",
+          headers: {
+            "auth-token": token,
+          },
+        });
+        await axios({
+          url: `http://localhost:3000/auth/updateCal?id=${this.calendarId}`,
+          method: "PUT",
+          headers: {
+            "auth-token": token,
+          },
+        });
+        location.reload();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    unsubcribeCalendar: async function() {
+      try {
+        const token = localStorage.getItem("token");
+        await axios({
+          url: `http://localhost:3000/auth/updateCal?id=${this.calendarId}`,
+          method: "PUT",
+          headers: {
+            "auth-token": token,
+          },
+        });
+        location.reload();
       } catch (error) {
         console.log(error);
       }
     },
   },
+
   async created() {
+    this.user = localStorage.getItem("id");
     this.color = await this.getColor();
     this.rules = await this.getAccessRules();
     await this.addCalendarList();
