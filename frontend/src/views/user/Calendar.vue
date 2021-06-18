@@ -387,9 +387,18 @@ export default {
   },
 };
 </script>
-<style scoped lang="scss">
-.v-calendar-weekly__day-label {
-  display: none !important;
+<style lang="scss">
+.v-calendar-weekly__day-label{
+  .v-btn{
+    width: 100px !important;
+    border-radius: 10px;
+  }
+}
+.v-calendar-daily_head-day-label{
+    .v-btn{
+    width: 100px !important;
+    border-radius: 10px;
+  }
 }
 .v-event-draggable {
   padding-left: 6px;

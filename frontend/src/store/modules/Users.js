@@ -62,6 +62,28 @@ const actions = {
             const respUser = resp.data.user
             localStorage.setItem('token', token)
             localStorage.setItem('id', respUser._id)
+            localStorage.setItem('role', respUser.Role)
+            localStorage.setItem('faculty', respUser.Faculty)
+            axios.defaults.headers.common['auth-token'] = token
+            commit('auth_success', token, respUser)
+
+            return resp
+        } catch (error) {
+            console.log(error)
+            commit('auth_error', error)
+            localStorage.removeItem('token')
+        }
+    },
+    async registerMinistry({ commit }, user) {
+        commit('auth_request')
+        try {
+            let resp = await axios({ url: 'http://localhost:3000/auth/registerministry', data: user, method: 'POST' });
+            const token = resp.data.token
+            const respUser = resp.data.user
+            localStorage.setItem('token', token)
+            localStorage.setItem('id', respUser._id)
+            localStorage.setItem('role', respUser.Role)
+            localStorage.setItem('faculty', respUser.Faculty)
             axios.defaults.headers.common['auth-token'] = token
             commit('auth_success', token, respUser)
 

@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import { registerValidation, loginValidation } from '../../../validation';
 import Event from "../models/Events";
-
+import BaseCalendar from "../models/BaseCalendars";
 
 import User from "../models/Users";
 
@@ -47,11 +47,14 @@ export default {
       res.status(4000).send(error);
     }
   },
-  registerAdmin: async function (req, res) {
-    const { name, email, password } = req.body;
+  registerMinistry: async (req, res) => {
+    const { name, email, password, faculty } = req.body;
+
+    console.log(req.body)
     //VALIDATE
     const { error } = registerValidation(req.body);
     if (error) {
+      console.log(error)
       return res.status(400).send(error.details[0].message)
     }
     try {
@@ -65,18 +68,58 @@ export default {
       const hashPassword = await bcrypt.hash(req.body.password, salt);
 
       const user = new User({
-        name: name,
-        email: email,
-        password: hashPassword,
-        isAdmin: true,
+        Name: name,
+        Email: email,
+        Password: hashPassword,
+        Role: '6071f3fc465293cd03744986',
+        Faculty: faculty,
+        CalendarLists: []
       });
 
       const savedUser = await user.save();
       //Create and sign Token
       const token = jwt.sign({ _id: savedUser._id }, process.env.jwtSecret, { expiresIn: 86400 });
+      console.log(savedUser)
+      //Create Activities Calendar
+      let result = await BaseCalendar.find({ CalendarTitle: 'Activities Calendar' })
+        .populate('Owner', 'Name Faculty Role')
+        .populate('AccessRuleId', 'AccessName')
+      
+      if (result.length == 0) {
+        let baseCalendar = new BaseCalendar();
+        baseCalendar.CalendarTitle = 'Activities Calendar';
+        baseCalendar.CalendarDescription = 'Activities Calendar'
+        baseCalendar.AccessRuleId = "607429067a1850bd9014fdf9";
+        baseCalendar.isHidden = true;
+        baseCalendar.Events = []
+        baseCalendar.Owner = savedUser._id
+        await baseCalendar.save();
+      } else {
+        let count = 0;
+        for (let item of result) {
+          if (item.Owner.Faculty == faculty && item.Owner.Role == '6071f3fc465293cd03744986') {
+            count = 0
+            break;
+          } else {
+            count = 1;
+          }
+        }
+        if (count != 0){
+          let baseCalendar = new BaseCalendar();
+          baseCalendar.CalendarTitle = 'Activities Calendar';
+          baseCalendar.CalendarDescription = 'Activities Calendar'
+          baseCalendar.AccessRuleId = "607429067a1850bd9014fdf9";
+          baseCalendar.isHidden = true;
+          baseCalendar.Events = []
+          baseCalendar.Owner = savedUser._id
+          await baseCalendar.save();
+        }
+      }
+
       res.status(200).header('auth-token', token).send({ auth: true, token: token, user: savedUser });
 
     } catch (error) {
+      console.log(error)
       res.status(4000).send(error);
     }
   },

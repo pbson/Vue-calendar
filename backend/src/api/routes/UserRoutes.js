@@ -5,6 +5,7 @@ import verifyToken from '../middleware/verifyToken';
 const router = Router();
 
 router.post("/register", controller.register );
+router.post("/registerministry", controller.registerMinistry );
 router.delete('/delete',controller.delete);
 router.post("/login", controller.login);
 router.put("/update", controller.update);

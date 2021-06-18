@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"backend.users"},{"v":2,"key":{"_fts":"text","_ftsx":1},"name":"Email_text","ns":"backend.users","background":true,"weights":{"Email":1},"default_language":"english","language_override":"language","textIndexVersion":3}],"uuid":"7e9e6f051248457884cc3bc8dc7a2ae5"}

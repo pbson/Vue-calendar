@@ -7,13 +7,18 @@ let path = require('path');
 export default {
     getAll: async function (req, res) {
         try {
-            let calendar = await BaseCalendar.find({ Owner: req.user._id })
-            .populate({
-                path: 'Events',
-                populate: {
-                    path: 'Attendees.UserId'
-                }
-            })
+            let calendar = await BaseCalendar.find()
+                .populate({
+                    path: 'Owner',
+                    match: { Role: '6071f3fc465293cd03744986'},
+                })
+                .populate({
+                    path: 'Events',
+                    populate: {
+                        path: 'Attendees.UserId'
+                    }
+                })
+            console.log(calendar)
             if (calendar) {
                 return res
                     .status(200)
@@ -38,18 +43,23 @@ export default {
     },
     getEvents: async function (req, res) {
         try {
-            let calendar = await BaseCalendar.findOne({ Owner: req.user._id, CalendarTitle: 'Activities Calendar' })
+            let calendar = await BaseCalendar.find({ CalendarTitle: 'Activities Calendar' })
+                .populate('Owner', 'Name Faculty Role')
                 .populate({
                     path: 'Events',
                     populate: {
                         path: 'Attendees.UserId'
                     }
                 })
+            calendar = calendar.filter(function (item) {
+                return item.Owner.Faculty == req.query.faculty && item.Owner.Role == '6071f3fc465293cd03744986';
+            });
+            console.log(calendar)
             return res
                 .status(200)
                 .json({
                     status: 'OK',
-                    data: calendar
+                    data: calendar[0]
                 })
         } catch (error) {
             console.log(error)

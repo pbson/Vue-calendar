@@ -26,12 +26,6 @@
             </v-row>
           </template>
         </v-img>
-        <div class="text-center mt-12 mb-3">
-          <router-link to="/register">
-            <v-btn rounded outlined>Register</v-btn>
-          </router-link>
-          <!-- <v-btn rounded outlined>Register</v-btn> -->
-        </div>
       </div>
     </v-col>
     <v-col

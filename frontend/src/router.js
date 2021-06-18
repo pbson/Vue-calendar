@@ -377,11 +377,11 @@ let router = new Router({
             next('/admin/user')
             return
           }else{
-            next('/calendar')
+            next('/ministry/calendar')
             return
           }
         } else {
-          next('/ministry/login')
+          next()
           return
         }
       }

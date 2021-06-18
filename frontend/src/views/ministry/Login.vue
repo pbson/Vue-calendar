@@ -27,7 +27,7 @@
           </template>
         </v-img>
         <div class="text-center mt-12 mb-3">
-          <router-link to="/register">
+          <router-link to="/ministry/register">
             <v-btn rounded outlined>Register</v-btn>
           </router-link>
           <!-- <v-btn rounded outlined>Register</v-btn> -->

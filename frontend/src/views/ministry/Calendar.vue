@@ -403,8 +403,9 @@ export default {
     async initialize() {
       try {
         const token = localStorage.getItem("token");
+        const faculty = localStorage.getItem("faculty");
         let resp = await axios({
-          url: "http://localhost:3000/base-calendar/getAll",
+          url: `http://localhost:3000/base-calendar/getall?faculty=${faculty}`,
           method: "GET",
           headers: {
             "auth-token": token,

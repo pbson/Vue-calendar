@@ -344,8 +344,9 @@ export default {
     async initialize() {
       try {
         const token = localStorage.getItem("token");
+        const faculty = localStorage.getItem("faculty");
         let resp = await axios({
-          url: "http://localhost:3000/base-calendar/get-events",
+          url: `http://localhost:3000/base-calendar/get-events?faculty=${faculty}`,
           method: "GET",
           headers: {
             "auth-token": token,
@@ -424,6 +425,7 @@ export default {
         this.isAddItem = false;
         this.close();
       }, 200);
+      this.initialize();
     },
 
     editItem(item) {
@@ -431,6 +433,7 @@ export default {
       this.name = item.FacultyName;
       this.description = item.FacultyDescription;
       this.dialog = true;
+      this.initialize();
     },
 
     deleteItem(item) {

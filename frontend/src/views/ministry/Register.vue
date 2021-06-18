@@ -108,7 +108,7 @@
           </template>
         </v-img>
         <div class="text-center mt-12 mb-3">
-          <router-link to="/login">
+          <router-link to="/ministry/login">
             <v-btn rounded outlined>Sign in</v-btn>
           </router-link>
           <!-- <v-btn rounded outlined>Register</v-btn> -->
@@ -155,49 +155,6 @@ export default {
     ...mapActions([
       "addBaseCalendar", //also supports payload `this.nameOfAction(amount)`
     ]),
-    sendAddCalendarApi: async function(cal) {
-      try {
-        const token = localStorage.getItem("token");
-        let baseCalendar = {
-          title: cal.title,
-          description: cal.description,
-          events: [],
-          accessRuleId: "607429067a1850bd9014fdf9",
-          isHidden: true,
-        };
-        let resp = await axios({
-          url: "http://localhost:3000/base-calendar/add",
-          data: baseCalendar,
-          method: "POST",
-          headers: {
-            "auth-token": token,
-          },
-        });
-        let calendarEntries = {
-          calendarId: resp.data.data._id,
-          colorId: cal.colorId,
-          isPrimary: true,
-          time: 30,
-        };
-        await axios({
-          url: "http://localhost:3000/calendar-entries/add",
-          data: calendarEntries,
-          method: "POST",
-          headers: {
-            "auth-token": token,
-          },
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    addCalendar: function() {
-      this.sendAddCalendarApi({
-        title: "Activities Calendar",
-        description: "This is activities calendar",
-        colorId: "6071c9d085a2fbbac38d90e6",
-      });
-    },
     register: async function() {
       let data = {
         name: this.name,
@@ -206,9 +163,8 @@ export default {
         faculty: this.selectFaculty,
       };
       try {
-        await this.$store.dispatch("register", data);
-        this.$router.push("/ministry/calendar");
-        this.addCalendar();
+        await this.$store.dispatch("registerMinistry", data);
+        this.$router.push("/ministry/login");
       } catch (error) {
         console.log(error);
       }
