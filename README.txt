@@ -15,3 +15,7 @@ Open another terminal and also go to Vue-Calendar
 cd frontend
 npm i 
 npm run serve
+
+Login Admin: /admin/login
+Login Ministry: /minsitry/login
+Register Ministry: /minsitry/register
