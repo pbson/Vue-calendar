@@ -8,11 +8,12 @@ export default {
         try {
             let eventList = []
             let reminderList = []
+            let colorList = []
             let calendarList = await User.findOne({ _id: req.user._id }).select({ "CalendarLists.CalendarId": 1, "_id": 1 })
                 .populate({
                     path: 'CalendarLists',
                     populate: {
-                        path: 'CalendarId Events'
+                        path: 'CalendarId Events ColorId'
                     }
                 })
             calendarList.CalendarLists.map((item) => {
@@ -20,6 +21,9 @@ export default {
                     ...eventList,
                     ...item.CalendarId.Events
                 ]
+                for (let i=0;i<item.CalendarId.Events.length;i++){
+                    colorList.push(item.ColorId)
+                }
                 return eventList
             })
             calendarList.CalendarLists.map((item) => {
@@ -29,17 +33,34 @@ export default {
                 ]
                 return reminderList
             })
-            let result = await Event.find()
-                .where('_id')
-                .in(eventList)
+            console.log(eventList)
+            // let result = await Event.find()
+            //     .where('_id')
+            //     .in(eventList)
+            //     .populate('ColorId', 'EventMain EventSecondary')
+            //     .populate('BaseCalendarId', 'CalendarTitle')
+            //     .populate('Attendees.UserId', 'Email Name')
+            
+            let result = await Promise.all(eventList.map(async item => {
+                let res = await Event.findOne({_id: item})
                 .populate('ColorId', 'EventMain EventSecondary')
                 .populate('BaseCalendarId', 'CalendarTitle')
                 .populate('Attendees.UserId', 'Email Name')
+                return res
+            }))
+            console.log(result)
 
             const map = new Map();
             result.forEach(item => map.set(item._id.toString(), item));
             reminderList.forEach(item => map.set(item.eventId, { ...map.get(item.eventId).toObject(), minute: item.minute }));
             const mergedArr = Array.from(map.values());
+
+            var j = 0
+
+            mergedArr.forEach(item=>{
+                item.ColorId = colorList[j]
+                j++;
+            })
 
             if (eventList) {
                 return res

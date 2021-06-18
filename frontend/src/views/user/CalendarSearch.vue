@@ -46,10 +46,16 @@ export default {
   },
   methods: {
     async searchCalendar() {
+      this.result = []
       const token = localStorage.getItem("token");
+      let data = {
+        calendar: this.calendar,
+        user: this.user
+      }
       let resp = await axios({
-        url: `http://localhost:3000/base-calendar/search?calendar=${this.calendar}&user=${this.user}&index=0&count=20`,
-        method: "GET",
+        url: `http://localhost:3000/base-calendar/search?index=0&count=20`,
+        method: "POST",
+        data: data,
         headers: {
           "auth-token": token,
         },

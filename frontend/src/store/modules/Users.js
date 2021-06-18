@@ -1,4 +1,5 @@
 import axios from 'axios'
+import swal from "sweetalert";
 
 const state = {
     status: '',
@@ -46,6 +47,7 @@ const actions = {
                     resolve(resp)
                 })
                 .catch(err => {
+                    swal("Login error!", "Please check your field again!", "error");
                     commit('auth_error')
                     localStorage.removeItem('token')
                     reject(err)
@@ -74,6 +76,9 @@ const actions = {
         return new Promise((resolve) => {
             commit('logout')
             localStorage.removeItem('token')
+            localStorage.removeItem('role')
+            localStorage.removeItem('id')
+            localStorage.removeItem('faculty')
             delete axios.defaults.headers.common['auth-token']
             resolve()
         })

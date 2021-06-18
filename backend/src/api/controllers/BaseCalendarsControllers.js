@@ -236,10 +236,11 @@ export default {
     },
     search: async function (req, res) {
         try {
-            if (req.query.calendar) {
-                if (req.query.user) {
-                    let userId = await User.findOne({ $text: { $search: req.query.user } }).select('_id')
-                    let result = await BaseCalendar.find({ $text: { $search: req.query.calendar }, Owner: userId, isHidden: false })
+            console.log(req.body)
+            if (req.body.calendar) {
+                if (req.body.user) {
+                    let userId = await User.findOne({ $text: { $search: req.body.user } }).select('_id')
+                    let result = await BaseCalendar.find({ $text: { $search: req.body.calendar }, Owner: userId, isHidden: false })
                         .skip(new Number(req.query.index))
                         .limit(new Number(req.query.count))
                         .populate('Owner', 'Name')
@@ -251,7 +252,7 @@ export default {
                             status: 'OK'
                         })
                 } else {
-                    let result = await BaseCalendar.find({ $text: { $search: req.query.calendar } })
+                    let result = await BaseCalendar.find({ $text: { $search: req.body.calendar }, isHidden: false })
                         .skip(new Number(req.query.index))
                         .limit(new Number(req.query.count))
                         .populate('Owner', 'Name')
@@ -265,8 +266,8 @@ export default {
                 }
             }
             else {
-                let userId = await User.findOne({ $text: { $search: req.query.user } }).select('_id')
-                let result = await BaseCalendar.find({ Owner: userId })
+                let userId = await User.findOne({ $text: { $search: req.body.user } }).select('_id')
+                let result = await BaseCalendar.find({ Owner: userId, isHidden: false })
                     .skip(new Number(req.query.index))
                     .limit(new Number(req.query.count))
                     .populate('Owner', 'Name')

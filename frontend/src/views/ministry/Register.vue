@@ -6,7 +6,7 @@
       class="d-flex flex-column align-center justify-center"
     >
       <div class="main text-center">
-        <h1 class="mb-10 text-center mt-4">Start using SCal</h1>
+        <h1 class="mb-10 text-center mt-4">Start using SCalendar</h1>
         <v-form
           ref="form"
           v-model="valid"
@@ -93,9 +93,9 @@
       class="d-flex flex-row sidepanel justify-center align-center"
     >
       <div class="sidepanel text-center">
-        <h1 class="dark--text sidepanel__main-text">Discover SCal</h1>
+        <h1 class="dark--text sidepanel__main-text">Discover SCalendar</h1>
         <h2 class="sidepanel__secondary-text">
-          Discover the world’s top Designers & Creatives.
+          Make your time, manage your work easier
         </h2>
         <v-img src="../../assets/register.png" max-width="500" max-height="500">
           <template v-slot:placeholder>

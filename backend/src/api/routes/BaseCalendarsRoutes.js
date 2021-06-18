@@ -10,6 +10,6 @@ router.put("/update",verifyToken, controller.update);
 router.get("/getall",verifyToken, controller.getAll);
 router.get("/generate-ics", controller.generateIcs)
 router.get("/get-events",verifyToken, controller.getEvents)
-router.get("/search",verifyToken, controller.search)
+router.post("/search",verifyToken, controller.search)
 
 module.exports = router;

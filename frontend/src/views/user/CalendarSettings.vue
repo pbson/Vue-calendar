@@ -59,7 +59,14 @@
                     label="Color*"
                     :disabled="Owner != user"
                     required
-                  ></v-select>
+                  >
+                    <template slot="item" slot-scope="data">
+                      <!-- HTML that describe how select should render items when the select is open -->
+                      {{ data.item.name }}
+                      <br />
+                      <v-icon :color="data.item.name">mdi-circle </v-icon>
+                    </template>
+                  </v-select>
                 </v-col>
               </v-row>
 
@@ -254,12 +261,13 @@ export default {
             "auth-token": token,
           },
         });
-        return resp.data.data.map(function(elem) {
+        let mapArray = resp.data.data.map(function(elem) {
           let obj = {};
           obj["id"] = elem._id;
           obj["name"] = elem.AccessName;
           return obj;
         });
+        return mapArray.filter((item) => item.name != "school");
       } catch (error) {
         console.log(error);
       }

@@ -10,7 +10,7 @@
           Welcome back
         </h1>
         <h2 class="sidepanel__secondary-text">
-          Discover the world’s top Designers & Creatives.
+          Make your time, manage your work easier
         </h2>
         <v-img
           src="../../assets/vector-creator.png"
@@ -41,7 +41,7 @@
     >
       <div class="main">
         <h1 class="mb-10 text-center mt-4">
-          Sign in to SCal
+          Sign in to SCalendar
         </h1>
         <v-form
           ref="form"
@@ -101,7 +101,9 @@ export default {
       let password = this.password;
       this.$store
         .dispatch("login", { email, password })
-        .then(() => this.$router.push("/ministry/calendar"))
+        .then(() => {
+            this.$router.push("/ministry/calendar");
+        })
         .catch((err) => console.log(err));
     },
     validate() {

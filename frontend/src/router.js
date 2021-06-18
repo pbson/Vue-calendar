@@ -1,9 +1,8 @@
 
 import Vue from 'vue'
 import Router from 'vue-router'
-import store from './store/store.js'
+// import store from './store/store.js'
 
-import Home from './views/user/Home.vue'
 import Login from './views/user/Login.vue'
 import Register from './views/user/Register.vue'
 
@@ -34,133 +33,396 @@ let router = new Router({
   mode: 'history',
   routes: [
     {
-      path:'/calendar',
-      name:'calendar',
-      components:{
+      path: '/',
+      name: 'homepage',
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          next('/calendar')
+          return
+        } else {
+          next('/login')
+        }
+      }
+    },
+    {
+      path: '/calendar',
+      name: 'calendar',
+      components: {
         default: Calendar,
         header: AppBar
-      } 
-    },
-    {
-      path:'/change-password',
-      name:'changePassword',
-      components: {
-        default:ChangePassword,
-        header:Header
       },
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3b0465293cd03744983') {
+            next('/admin/user')
+            return
+          }else if (localStorage.getItem("role") == '6071f3fc465293cd03744986'){
+            next('/ministry/user')
+            return
+          }else{
+            next()
+            return
+          }
+        } else {
+          next('/login')
+          return
+        }
+      }
     },
     {
-      path:'/calendar-settings',
-      name:'calendarSettings',
+      path: '/change-password',
+      name: 'changePassword',
+      components: {
+        default: ChangePassword,
+        header: Header
+      },
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3b0465293cd03744983') {
+            next('/admin/user')
+            return
+          }else if (localStorage.getItem("role") == '6071f3fc465293cd03744986'){
+            next('/ministry/user')
+            return
+          }else{
+            next()
+            return
+          }
+        } else {
+          next('/login')
+          return
+        }
+      }
+    },
+    {
+      path: '/calendar-settings',
+      name: 'calendarSettings',
       components: {
         default: CalendarSettings,
         header: Header
       },
-    },
-    {
-      path:'/calendar-search',
-      name:'calendarSearch',
-      components: {
-        default:CalendarSearch,
-        header:Header
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3b0465293cd03744983') {
+            next('/admin/user')
+            return
+          }else if (localStorage.getItem("role") == '6071f3fc465293cd03744986'){
+            next('/ministry/user')
+            return
+          }else{
+            next()
+            return
+          }
+        } else {
+          next('/login')
+          return
+        }
       }
     },
     {
-      path:'/user-settings',
-      name:'userSettings',
+      path: '/calendar-search',
+      name: 'calendarSearch',
       components: {
-        default:UserSettings,
-        header:Header
+        default: CalendarSearch,
+        header: Header
+      },
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3b0465293cd03744983') {
+            next('/admin/user')
+            return
+          }else if (localStorage.getItem("role") == '6071f3fc465293cd03744986'){
+            next('/ministry/user')
+            return
+          }else{
+            next()
+            return
+          }
+        } else {
+          next('/login')
+          return
+        }
       }
     },
     {
-      path: '/',
-      name: 'home',
-      component: Home
+      path: '/user-settings',
+      name: 'userSettings',
+      components: {
+        default: UserSettings,
+        header: Header
+      },
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3b0465293cd03744983') {
+            next('/admin/user')
+            return
+          }else if (localStorage.getItem("role") == '6071f3fc465293cd03744986'){
+            next('/ministry/user')
+            return
+          }else{
+            next()
+            return
+          }
+        } else {
+          next('/login')
+          return
+        }
+      }
     },
     {
       path: '/login',
       name: 'login',
-      component: Login
+      component: Login,
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3b0465293cd03744983') {
+            next('/admin/user')
+            return
+          }else if (localStorage.getItem("role") == '6071f3fc465293cd03744986'){
+            next('/ministry/user')
+            return
+          }else{
+            next()
+            return
+          }
+        } else {
+          next()
+          return
+        }
+      }
     },
     {
       path: '/register',
       name: 'register',
-      component: Register
+      component: Register,
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3b0465293cd03744983') {
+            next('/admin/user')
+            return
+          }else if (localStorage.getItem("role") == '6071f3fc465293cd03744986'){
+            next('/ministry/user')
+            return
+          }else{
+            next()
+            return
+          }
+        } else {
+          next()
+          return
+        }
+      }
     },
     {
       path: '/admin/login',
       name: 'AdminLogin',
       components: {
-        default:AdminLogin,
+        default: AdminLogin,
       },
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3b0465293cd03744983') {
+            next()
+            return
+          }else if (localStorage.getItem("role") == '6071f3fc465293cd03744986'){
+            next('/ministry/user')
+            return
+          }else{
+            next('/calendar')
+            return
+          }
+        } else {
+          next()
+          return
+        }
+      }
     },
     {
       path: '/admin/user',
       name: 'userManagement',
       components: {
-        default:User,
-        header:AdminHeader
+        default: User,
+        header: AdminHeader
       },
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3b0465293cd03744983') {
+            next()
+            return
+          }else if (localStorage.getItem("role") == '6071f3fc465293cd03744986'){
+            next('/ministry/calendar')
+            return
+          }else{
+            next('/calendar')
+            return
+          }
+        } else {
+          next('/admin/login')
+          return
+        }
+      }
     },
     {
       path: '/admin/subject',
       name: 'subjectManagement',
       components: {
-        default:Subject,
-        header:AdminHeader
+        default: Subject,
+        header: AdminHeader
       },
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3b0465293cd03744983') {
+            next()
+            return
+          }else if (localStorage.getItem("role") == '6071f3fc465293cd03744986'){
+            next('/ministry/calendar')
+            return
+          }else{
+            next('/calendar')
+            return
+          }
+        } else {
+          next('/admin/login')
+          return
+        }
+      }
     },
     {
       path: '/admin/faculty',
       name: 'facultyManagement',
       components: {
-        default:Faculty,
-        header:AdminHeader
+        default: Faculty,
+        header: AdminHeader
       },
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3b0465293cd03744983') {
+            next()
+            return
+          }else if (localStorage.getItem("role") == '6071f3fc465293cd03744986'){
+            next('/ministry/calendar')
+            return
+          }else{
+            next('/calendar')
+            return
+          }
+        } else {
+          next('/admin/login')
+          return
+        }
+      }
     },
     {
       path: '/ministry/calendar',
       name: 'ministryCalendar',
       components: {
-        default:MinistryCalendar,
-        header:AdminHeader
+        default: MinistryCalendar,
+        header: AdminHeader
       },
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3fc465293cd03744986') {
+            next()
+            return
+          }else if (localStorage.getItem("role") == '6071f3b0465293cd03744983'){
+            next('/admin/user')
+            return
+          }else{
+            next('/calendar')
+            return
+          }
+        } else {
+          next('/ministry/login')
+          return
+        }
+      }
     },
     {
       path: '/ministry/activities',
       name: 'MinistryActivities',
       components: {
-        default:MinistryActivities,
-        header:AdminHeader
+        default: MinistryActivities,
+        header: AdminHeader
       },
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3fc465293cd03744986') {
+            next()
+            return
+          }else if (localStorage.getItem("role") == '6071f3b0465293cd03744983'){
+            next('/admin/user')
+            return
+          }else{
+            next('/calendar')
+            return
+          }
+        } else {
+          next('/ministry/login')
+          return
+        }
+      }
     },
     {
       path: '/ministry/register',
       name: 'MinistryRegister',
       components: {
-        default:MinistryRegister,
+        default: MinistryRegister,
       },
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3fc465293cd03744986') {
+            next()
+            return
+          }else if (localStorage.getItem("role") == '6071f3b0465293cd03744983'){
+            next('/admin/user')
+            return
+          }else{
+            next('/calendar')
+            return
+          }
+        } else {
+          next('/ministry/login')
+          return
+        }
+      }
     },
     {
       path: '/ministry/login',
       name: 'MinistryLogin',
       components: {
-        default:MinistryLogin,
+        default: MinistryLogin,
       },
+      beforeEnter: (to, from, next) => {
+        if (localStorage.getItem("token")) {
+          if (localStorage.getItem("role") == '6071f3fc465293cd03744986') {
+            next()
+            return
+          }else if (localStorage.getItem("role") == '6071f3b0465293cd03744983'){
+            next('/admin/user')
+            return
+          }else{
+            next('/calendar')
+            return
+          }
+        } else {
+          next()
+          return
+        }
+      }
     }
   ]
 })
 
-router.beforeEach((to, from, next) => {
-  if(to.matched.some(record => record.meta.requiresAuth)) {
-    if (store.getters.isLoggedIn) {
+router.beforeResolve((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (localStorage.getItem("token")) {
       next()
       return
+    } else {
+      next('/login')
     }
-    next('/login') 
   } else {
-    next() 
+    next()
   }
 })
 
