@@ -9,6 +9,7 @@ export default {
             let eventList = []
             let reminderList = []
             let colorList = []
+            // let accessRules = []
             let calendarList = await User.findOne({ _id: req.user._id }).select({ "CalendarLists.CalendarId": 1, "_id": 1 })
                 .populate({
                     path: 'CalendarLists',
@@ -23,6 +24,7 @@ export default {
                 ]
                 for (let i=0;i<item.CalendarId.Events.length;i++){
                     colorList.push(item.ColorId)
+                    // accessRules.push(item.CalendarId.AccessRuleId)
                 }
                 return eventList
             })
@@ -33,7 +35,6 @@ export default {
                 ]
                 return reminderList
             })
-            console.log(eventList)
             // let result = await Event.find()
             //     .where('_id')
             //     .in(eventList)
@@ -44,11 +45,10 @@ export default {
             let result = await Promise.all(eventList.map(async item => {
                 let res = await Event.findOne({_id: item})
                 .populate('ColorId', 'EventMain EventSecondary')
-                .populate('BaseCalendarId', 'CalendarTitle')
+                .populate('BaseCalendarId', 'CalendarTitle AccessRuleId')
                 .populate('Attendees.UserId', 'Email Name')
                 return res
             }))
-            console.log(result)
 
             const map = new Map();
             result.forEach(item => map.set(item._id.toString(), item));
@@ -59,8 +59,10 @@ export default {
 
             mergedArr.forEach(item=>{
                 item.ColorId = colorList[j]
+                // item.AccessRuleId = accessRules[j]
                 j++;
             })
+            console.log(mergedArr)
 
             if (eventList) {
                 return res
@@ -223,7 +225,6 @@ export default {
                 }
             })
 
-            console.log(calendarEntries);
             let index = calendar.Events.indexOf(event.BaseCalendarId);
             if (index > -1) {
                 calendar.Events.splice(index, 1);

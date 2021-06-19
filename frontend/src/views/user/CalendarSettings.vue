@@ -345,13 +345,13 @@ export default {
             "auth-token": token,
           },
         });
-        await axios({
-          url: `http://localhost:3000/auth/updateCal?id=${this.calendarId}`,
-          method: "PUT",
-          headers: {
-            "auth-token": token,
-          },
-        });
+        // await axios({
+        //   url: `http://localhost:3000/auth/updateCal?id=${this.calendarId}`,
+        //   method: "PUT",
+        //   headers: {
+        //     "auth-token": token,
+        //   },
+        // });
         location.reload();
       } catch (error) {
         console.log(error);

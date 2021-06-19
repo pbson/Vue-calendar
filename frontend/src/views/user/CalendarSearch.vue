@@ -22,6 +22,7 @@
             :description="item.CalendarDescription"
             :owner="item.Owner.Name"
             :rule="item.AccessRuleId.AccessName"
+            :role="item.Owner.Role"
           />
         </v-row>
       </v-sheet>
@@ -53,7 +54,7 @@ export default {
         user: this.user
       }
       let resp = await axios({
-        url: `http://localhost:3000/base-calendar/search?index=0&count=20`,
+        url: `http://localhost:3000/base-calendar/search?index=0&count=100`,
         method: "POST",
         data: data,
         headers: {

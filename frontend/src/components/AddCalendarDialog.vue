@@ -156,12 +156,13 @@ export default {
             "auth-token": token,
           },
         });
-        return resp.data.data.map(function(elem) {
+        let mapArray =  resp.data.data.map(function(elem) {
           let obj = {};
           obj["id"] = elem._id;
           obj["name"] = elem.AccessName;
           return obj;
         });
+        return mapArray.filter((item) => item.name != "school");
       } catch (error) {
         console.log(error);
       }
@@ -199,6 +200,7 @@ export default {
         });
         this.addCalendarList();
         this.dialog = false;
+        location.reload()
       } catch (error) {
         console.log(error);
       }

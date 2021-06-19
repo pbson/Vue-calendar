@@ -25,6 +25,7 @@ import MinistryRegister from './views/ministry/Register.vue'
 import AppBar from './components/AppBar.vue'
 import Header from './components/Header.vue'
 import AdminHeader from './components/AdminHeader.vue'
+import MinistryHeader from './components/MinistryHeader.vue'
 
 
 Vue.use(Router)
@@ -317,7 +318,7 @@ let router = new Router({
       name: 'ministryCalendar',
       components: {
         default: MinistryCalendar,
-        header: AdminHeader
+        header: MinistryHeader
       },
       beforeEnter: (to, from, next) => {
         if (localStorage.getItem("token")) {
@@ -342,7 +343,7 @@ let router = new Router({
       name: 'MinistryActivities',
       components: {
         default: MinistryActivities,
-        header: AdminHeader
+        header: MinistryHeader
       },
       beforeEnter: (to, from, next) => {
         if (localStorage.getItem("token")) {

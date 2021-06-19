@@ -250,14 +250,18 @@ export default {
       const id = localStorage.getItem("id");
       if (id == payload.owner) {
         return true;
-      } else if (!payload.attendees) {
-        return false;
       } else {
-        let user = payload.attendees.find((el) => el.UserId._id === id);
-        if (user && user.AccessRuleId == "607428fa7a1850bd9014fdf8") {
-          return false;
-        } else if (user && user.AccessRuleId == "607429067a1850bd9014fdf9") {
+        if (payload.accessRules == "607429067a1850bd9014fdf9") {
           return true;
+        } else if (!payload.attendees) {
+          return false;
+        } else {
+          let user = payload.attendees.find((el) => el.UserId._id === id);
+          if (user && user.AccessRuleId == "607428fa7a1850bd9014fdf8") {
+            return false;
+          } else if (user && user.AccessRuleId == "607429067a1850bd9014fdf9") {
+            return true;
+          }
         }
       }
     },
@@ -388,14 +392,14 @@ export default {
 };
 </script>
 <style lang="scss">
-.v-calendar-weekly__day-label{
-  .v-btn{
+.v-calendar-weekly__day-label {
+  .v-btn {
     width: 100px !important;
     border-radius: 10px;
   }
 }
-.v-calendar-daily_head-day-label{
-    .v-btn{
+.v-calendar-daily_head-day-label {
+  .v-btn {
     width: 100px !important;
     border-radius: 10px;
   }

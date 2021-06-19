@@ -2,6 +2,7 @@ import axios from 'axios'
 import { rrulestr } from 'rrule';
 import { format, parseISO, endOfMonth } from 'date-fns';
 import { DateTime } from 'luxon';
+// import AccessRules from '../../../../backend/src/api/models/AccessRules';
 
 function leadingZero(num) {
     return ('0' + num).slice(-2);
@@ -41,7 +42,8 @@ function createAllEvents(events, focus) {
                 category: item.Type,
                 attendees: item.Attendees,
                 isComplete: item.IsComplete,
-                owner: item.Owner
+                owner: item.Owner,
+                accessRules: item.BaseCalendarId.AccessRuleId
             })
         }
     });
@@ -63,8 +65,6 @@ function makeRecurringEvents(payload, focus) {
         .between(recurStart, recurEnd)
         .map((date) => format(DateTime.fromJSDate(date).toUTC().setZone('local', { keepLocalTime: true }).toJSDate(), 'yyyy-MM-dd'));
     
-    console.log(payload.RecurrencePattern);
-
     for (let recurDate of recurDates) {
         let tmpObj = {
             start: `${recurDate} ${payload.StartAt}`,
@@ -83,7 +83,8 @@ function makeRecurringEvents(payload, focus) {
             category: payload.Type,
             attendees: payload.Attendees,
             isComplete: payload.IsComplete,
-            owner: payload.Owner
+            owner: payload.Owner,
+            accessRules: payload.BaseCalendarId.AccessRuleId
         };
         recurringEvents.push(tmpObj);
     }

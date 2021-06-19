@@ -3,6 +3,7 @@ import timestamps from 'mongoose-timestamp';
 import Users from './Users'
 import AccessRules from './AccessRules'
 import Events from './Events'
+import CalendarEntries from './CalendarEntries'
 
 const baseCalendarsSchema = new Schema({
     Owner: {
@@ -31,6 +32,10 @@ const baseCalendarsSchema = new Schema({
 })
 
 baseCalendarsSchema.plugin(timestamps);
+baseCalendarsSchema.pre('remove', { document: true, query: false },async function(){
+    console.log('abc')
+    await CalendarEntries.deleteMany({ CalendarId: this._id });
+});
 baseCalendarsSchema.index({'CalendarTitle': 'text'});
 
 export default model('BaseCalendars', baseCalendarsSchema)

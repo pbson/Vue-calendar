@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-app-bar class="appBar" elevation="0">
-      <v-title class="title">Calendar Admin</v-title>
+      <v-title class="title">Calendar Ministry</v-title>
       <v-spacer></v-spacer>
 
       <v-btn @click="logout" icon>
@@ -16,7 +16,7 @@ export default {
   methods: {
     logout: function() {
       this.$store.dispatch("logout").then(() => {
-        this.$router.push("/admin/login");
+        this.$router.push("/ministry/login");
       });
     },
   },

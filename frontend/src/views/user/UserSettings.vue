@@ -116,13 +116,15 @@ export default {
           email: this.email,
           faculty: this.selectFaculty,
         };
-        await axios({
+        let resp = await axios({
           url: `http://localhost:3000/auth/update?id=${id}`,
           data: data,
           method: "PUT",
         });
+        console.log(resp.status)
         swal("Update successfully!", "User information updated", "success");
       } catch (error) {
+        swal("Update error!", "User information not updated", "error");
         console.log(error);
       }
     },

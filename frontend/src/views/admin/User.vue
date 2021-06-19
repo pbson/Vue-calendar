@@ -286,8 +286,6 @@ export default {
       try {
         const token = localStorage.getItem("token");
         let user = {
-          name: this.name,
-          email: this.email,
           role: this.selectRole,
           faculty: this.selectFaculty,
         };

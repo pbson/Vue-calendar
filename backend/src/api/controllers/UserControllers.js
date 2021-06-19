@@ -84,13 +84,13 @@ export default {
       let result = await BaseCalendar.find({ CalendarTitle: 'Activities Calendar' })
         .populate('Owner', 'Name Faculty Role')
         .populate('AccessRuleId', 'AccessName')
-      
+
       if (result.length == 0) {
         let baseCalendar = new BaseCalendar();
         baseCalendar.CalendarTitle = 'Activities Calendar';
         baseCalendar.CalendarDescription = 'Activities Calendar'
-        baseCalendar.AccessRuleId = "607429067a1850bd9014fdf9";
-        baseCalendar.isHidden = true;
+        baseCalendar.AccessRuleId = "607429737a1850bd9014fdfa";
+        baseCalendar.isHidden = false;
         baseCalendar.Events = []
         baseCalendar.Owner = savedUser._id
         await baseCalendar.save();
@@ -104,12 +104,12 @@ export default {
             count = 1;
           }
         }
-        if (count != 0){
+        if (count != 0) {
           let baseCalendar = new BaseCalendar();
           baseCalendar.CalendarTitle = 'Activities Calendar';
           baseCalendar.CalendarDescription = 'Activities Calendar'
-          baseCalendar.AccessRuleId = "607429067a1850bd9014fdf9";
-          baseCalendar.isHidden = true;
+          baseCalendar.AccessRuleId = "607429737a1850bd9014fdfa";
+          baseCalendar.isHidden = false;
           baseCalendar.Events = []
           baseCalendar.Owner = savedUser._id
           await baseCalendar.save();
@@ -253,12 +253,29 @@ export default {
   },
   update: async function (req, res) {
     try {
-      let user = await User.findOne({ _id: req.query.id })
+      if (req.body.email) {
+        let existUser = await User.findOne({ Email: req.body.email })
+        if (existUser) {
+          return res
+            .status(400)
+            .json({
+              status: 'Bad request',
+            })
+        }
+      }
 
-      user.Name = req.body.name;
-      user.Email = req.body.email;
-      user.Role = req.body.role;
-      user.Faculty = req.body.faculty;
+      let fieldToUpdate = {
+        Name: req.body.name,
+        Email: req.body.email,
+        Role: req.body.role,
+        Faculty: req.body.faculty
+      };
+      for (const [key, value] of Object.entries(fieldToUpdate)) {
+        if (value == null) {
+          delete fieldToUpdate[key];
+        }
+      }
+      let user = await User.findOneAndUpdate({ _id: req.query.id }, { $set: { ...fieldToUpdate } }, { new: true });
       user.save();
 
       return res

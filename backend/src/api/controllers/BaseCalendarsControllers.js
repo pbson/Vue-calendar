@@ -7,33 +7,25 @@ let path = require('path');
 export default {
     getAll: async function (req, res) {
         try {
-            let calendar = await BaseCalendar.find()
-                .populate({
-                    path: 'Owner',
-                    match: { Role: '6071f3fc465293cd03744986'},
-                })
+            let calendar = await BaseCalendar.find({AccessRuleId: "607429737a1850bd9014fdfa"})
+                .populate('Owner', 'Name Faculty Role')
                 .populate({
                     path: 'Events',
                     populate: {
                         path: 'Attendees.UserId'
                     }
                 })
-            console.log(calendar)
-            if (calendar) {
-                return res
-                    .status(200)
-                    .json({
-                        status: 'OK',
-                        data: calendar
-                    })
-            } else {
-                return res
-                    .status(404)
-                    .json({
-                        status: 'Not found',
-                    })
-            }
+            calendar = calendar.filter(function (item) {
+                return item.Owner.Faculty == req.query.faculty && item.Owner.Role == '6071f3fc465293cd03744986';
+            });
+            return res
+                .status(200)
+                .json({
+                    status: 'OK',
+                    data: calendar
+                })
         } catch (error) {
+            console.log(error)
             return res
                 .status(400)
                 .json({
@@ -222,7 +214,8 @@ export default {
     },
     delete: async function (req, res) {
         try {
-            let calendar = await BaseCalendar.findByIdAndRemove({ _id: req.query.id })
+            let calendar = await BaseCalendar.findById({ _id: req.query.id })
+            calendar.remove()
             if (calendar) {
                 return res
                     .status(200)
@@ -246,14 +239,26 @@ export default {
     },
     search: async function (req, res) {
         try {
-            console.log(req.body)
+            let resp = await User.findOne({ _id: req.user._id }).select({ "CalendarLists": 1, "_id": 1 })
+            .populate('CalendarLists', 'CalendarId')
+            let calendarList = resp.CalendarLists.map(item=>{
+                return item.CalendarId
+            })
+    
             if (req.body.calendar) {
                 if (req.body.user) {
                     let userId = await User.findOne({ $text: { $search: req.body.user } }).select('_id')
-                    let result = await BaseCalendar.find({ $text: { $search: req.body.calendar }, Owner: userId, isHidden: false })
+                    if (userId.id == req.user._id){
+                        return res
+                        .status(400)
+                        .json({
+                            status: 'Bad request',
+                        })
+                    }
+                    let result = await BaseCalendar.find({ '_id': { "$nin": calendarList }, $text: { $search: req.body.calendar }, Owner: userId, isHidden: false })
                         .skip(new Number(req.query.index))
                         .limit(new Number(req.query.count))
-                        .populate('Owner', 'Name')
+                        .populate('Owner', 'Name Role')
                         .populate('AccessRuleId', 'AccessName')
                     return res
                         .status(200)
@@ -262,10 +267,10 @@ export default {
                             status: 'OK'
                         })
                 } else {
-                    let result = await BaseCalendar.find({ $text: { $search: req.body.calendar }, isHidden: false })
+                    let result = await BaseCalendar.find({ '_id': { "$nin": calendarList}, $text: { $search: req.body.calendar },Owner: { "$ne": req.user._id }, isHidden: false })
                         .skip(new Number(req.query.index))
                         .limit(new Number(req.query.count))
-                        .populate('Owner', 'Name')
+                        .populate('Owner', 'Name Role')
                         .populate('AccessRuleId', 'AccessName')
                     return res
                         .status(200)
@@ -277,10 +282,17 @@ export default {
             }
             else {
                 let userId = await User.findOne({ $text: { $search: req.body.user } }).select('_id')
-                let result = await BaseCalendar.find({ Owner: userId, isHidden: false })
+                if (userId.id == req.user._id){
+                    return res
+                    .status(400)
+                    .json({
+                        status: 'Bad request',
+                    })
+                }
+                let result = await BaseCalendar.find({ '_id': { "$nin": calendarList }, Owner: userId, isHidden: false })
                     .skip(new Number(req.query.index))
                     .limit(new Number(req.query.count))
-                    .populate('Owner', 'Name')
+                    .populate('Owner', 'Name Role')
                     .populate('AccessRuleId', 'AccessName')
                 return res
                     .status(200)

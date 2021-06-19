@@ -2,6 +2,7 @@ import { Schema, model } from 'mongoose';
 import timestamps from 'mongoose-timestamp';
 import Users from './Users'
 import AccessRules from './AccessRules'
+import BaseCalendars from './BaseCalendars'
 
 const eventsSchema = new Schema({
     EventTitle: {
@@ -74,5 +75,8 @@ const eventsSchema = new Schema({
 })
 
 eventsSchema.plugin(timestamps);
+eventsSchema.pre('remove', { document: true, query: false },async function(){
+    await BaseCalendars.updateMany({}, { $pull: { Events: { $in: this._id } } }, { multi: true });
+});
 eventsSchema.index({ Owner: 1 });
 export default model('Events', eventsSchema)

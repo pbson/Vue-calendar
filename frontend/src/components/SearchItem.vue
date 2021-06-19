@@ -1,20 +1,25 @@
 <template>
   <v-card
-    class="d-flex flex-column elevation-0 rounded-lg searchResult"
+    class="d-flex flex-column elevation-0 rounded-lg"
     min-width="50%"
-    color="#385F73"
+    :color="isSchool"
     dark
   >
     <v-card-title class="headline">
       {{ this.title }}
+      <v-icon v-if="role != '6071f3fc465293cd03744986'">mdi-account</v-icon>
+      <v-icon v-else-if="role == '6071f3fc465293cd03744986'">mdi-school</v-icon>
     </v-card-title>
-    <v-card-subtitle class="align-self-start">{{ this.owner }}</v-card-subtitle>
+
+    <v-card-subtitle v-if="role != '6071f3fc465293cd03744986'" class="align-self-start">{{ this.owner }}</v-card-subtitle>
+    <v-card-subtitle v-else-if="role == '6071f3fc465293cd03744986'" class="align-self-start">{{ this.owner }}</v-card-subtitle>
 
     <v-card-actions>
       <div justify="center">
         <v-dialog v-model="dialog" persistent max-width="600px">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
+              id="no-background-hover"
               v-bind="attrs"
               v-on="on"
               class="ml-7 addCalendarButton elevation-0"
@@ -89,23 +94,23 @@
     </v-card-actions>
   </v-card>
 </template>
-<style scoped lang="scss">
-.searchResult {
-  background-color: $color-blue-primary !important;
-}
+<style lang="scss">
 .addCalendarButton {
   width: 40px;
   height: 40px;
-  background-color: $color-blue-primary !important;
+  background-color: transparent !important;
+}
+#no-background-hover::before {
+   background-color: transparent !important;
 }
 </style>
 <script>
 import axios from "axios";
 import { mapActions } from "vuex";
-import swal from 'sweetalert';
+import swal from "sweetalert";
 
 export default {
-  props: ["id", "title", "description", "owner", "rule"],
+  props: ["id", "title", "description", "owner", "rule", "role"],
   data: () => ({
     dialog: false,
     selectColor: null,
@@ -157,6 +162,11 @@ export default {
         console.log(error);
       }
     },
+  },
+  computed: {
+    isSchool: function(){
+      return this.role != '6071f3fc465293cd03744986' ? '#059FFD' : '#5CAF51'
+    }
   },
   async created() {
     this.color = await this.getColor();

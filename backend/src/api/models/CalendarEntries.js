@@ -7,7 +7,7 @@ import Colors from './Colors'
 const calendarEntriesSchema = new Schema({
     CalendarId: { 
         type: Schema.Types.ObjectId, 
-        ref: BaseCalendars,
+        ref: 'BaseCalendars',
         required: true
     },
     ColorId:{
@@ -26,4 +26,7 @@ const calendarEntriesSchema = new Schema({
 })
 
 calendarEntriesSchema.plugin(timestamps);
+calendarEntriesSchema.pre('updateOne', { document: true, query: false },function(){ console.log('Hello from pre delete')});
+calendarEntriesSchema.pre('save', () => console.log('Hello from pre save'));
+
 export default model('CalendarEntries', calendarEntriesSchema)
