@@ -16,6 +16,6 @@ cd frontend
 npm i 
 npm run serve
 
-Login Admin: /admin/login
+Login Admin: /admin/login with mail admin@gm
 Login Ministry: /minsitry/login
 Register Ministry: /minsitry/register
