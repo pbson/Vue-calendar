@@ -286,7 +286,8 @@ export default {
       } catch (error) {
         console.log(error);
       }
-      (this.name = ""), (this.code = ""), this.initialize();
+      (this.name = ""), (this.code = "");
+      this.initialize();
       this.isAddItem = false;
       this.close();
     },

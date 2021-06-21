@@ -12,7 +12,7 @@
     </v-card-title>
 
     <v-card-subtitle v-if="role != '6071f3fc465293cd03744986'" class="align-self-start">{{ this.owner }}</v-card-subtitle>
-    <v-card-subtitle v-else-if="role == '6071f3fc465293cd03744986'" class="align-self-start">{{ this.owner }}</v-card-subtitle>
+    <v-card-subtitle v-else-if="role == '6071f3fc465293cd03744986'" class="align-self-start">{{ this.faculty }}</v-card-subtitle>
 
     <v-card-actions>
       <div justify="center">
@@ -110,7 +110,7 @@ import { mapActions } from "vuex";
 import swal from "sweetalert";
 
 export default {
-  props: ["id", "title", "description", "owner", "rule", "role"],
+  props: ["id", "title", "description", "owner", "rule", "role","faculty"],
   data: () => ({
     dialog: false,
     selectColor: null,

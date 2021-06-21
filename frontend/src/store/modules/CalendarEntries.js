@@ -21,6 +21,7 @@ const getters = {
     getEventDialogCalendarList: state => {
         let role = localStorage.getItem('role')
         let owner = localStorage.getItem('id')
+        console.log(state.calendarList)
         let filterList = state.calendarList.filter(ele=>{
             if (ele.CalendarId.AccessRuleId == '607429737a1850bd9014fdfa' && role == '6071f3bb465293cd03744985'){
                 return;

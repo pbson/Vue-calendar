@@ -239,7 +239,7 @@ export default {
   methods: {
     ...mapActions(["addCalendarList", "initInstances"]),
     getDay(date) {
-      let i = lunar(new Date(date.date));
+      let i = lunar(new Date(date.date)); 
       return `${new Date(date.date).getDate()} (${i.day}/${i.month}  )`;
     },
     viewDay({ date }) {
@@ -337,7 +337,6 @@ export default {
           .subtract(item.reminder, "minutes")
           .toDate();
         await schedule.scheduleJob(reminderTime, function() {
-          console.log("i run");
           new Notification(item.name, {
             body: `${item.start} to ${item.end}`,
             sound: "../assets/noti.mp3",

@@ -516,14 +516,14 @@ export default {
 
     save: async function() {
       let calendar = await this.sendAddCalendarApi({
-        title: `${this.selectSubject}`,
+        title: `${this.selectSubject} - ${this.selectTeacher}`,
         description: `${this.selectSubject} - ${this.selectTeacher} - ${this.description}`,
         events: [],
         isHidden: false,
         accessRuleId: "607429737a1850bd9014fdfa",
       });
       this.sendAddEventApi({
-        title: `${this.selectSubject}`,
+        title: `${this.selectSubject} - ${this.selectTeacher}`,
         description: `${this.selectSubject} - ${this.selectTeacher} - ${this.description}`,
         startAt: this.fromTime,
         endAt: this.toTime,
@@ -545,7 +545,8 @@ export default {
       this.fromTime = null;
       this.toTime = null;
       this.fromDate = null;
-      this.length = null
+      this.length = null;
+      this.initialize();
     },
 
     editItem(item) {

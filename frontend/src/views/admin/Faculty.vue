@@ -36,7 +36,7 @@
         >
           <template v-slot:top>
             <v-toolbar flat>
-              <v-toolbar-title>Faculty List</v-toolbar-title>
+              <v-toolbar-title>School List</v-toolbar-title>
               <v-spacer></v-spacer>
               <v-text-field
                 v-model="search"
@@ -155,7 +155,7 @@ export default {
       items: [
         { title: "User", icon: "mdi-home", link: "/admin/user" },
         { title: "Subject", icon: "mdi-format-size", link: "/admin/subject" },
-        { title: "Faculty", icon: "mdi-grid-large", link: "/admin/faculty" },
+        { title: "School", icon: "mdi-grid-large", link: "/admin/faculty" },
       ],
     };
   },

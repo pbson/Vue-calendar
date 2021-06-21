@@ -33,9 +33,21 @@ const baseCalendarsSchema = new Schema({
 
 baseCalendarsSchema.plugin(timestamps);
 baseCalendarsSchema.pre('remove', { document: true, query: false },async function(){
-    console.log('abc')
     await CalendarEntries.deleteMany({ CalendarId: this._id });
 });
+baseCalendarsSchema.pre('save', { document: true, query: false },async function(){
+    if (this.isHidden == true){
+
+        let result = await CalendarEntries.find({ CalendarId: this._id }).sort('createdAt').distinct('_id')
+        .populate('CalendarId')
+        result.shift()
+        if (result.length>0){
+            await CalendarEntries.deleteMany({ _id: {'$in': result} });
+        }
+    }
+});
+
 baseCalendarsSchema.index({'CalendarTitle': 'text'});
 
 export default model('BaseCalendars', baseCalendarsSchema)
+

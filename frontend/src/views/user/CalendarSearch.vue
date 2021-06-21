@@ -23,6 +23,7 @@
             :owner="item.Owner.Name"
             :rule="item.AccessRuleId.AccessName"
             :role="item.Owner.Role"
+            :faculty="item.Owner.Faculty.FacultyName"
           />
         </v-row>
       </v-sheet>

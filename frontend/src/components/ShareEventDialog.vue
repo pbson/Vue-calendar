@@ -147,18 +147,24 @@ export default {
             "auth-token": token,
           },
         });
-        return resp.data.data.map(function(elem) {
+        let mapArray = resp.data.data.map(function(elem) {
           let obj = {};
           obj["id"] = elem._id;
           obj["name"] = elem.AccessName;
           return obj;
         });
+        return mapArray.filter((item) => item.name != "school");
       } catch (error) {
         console.log(error);
       }
     },
     async sendInvitation() {
-      if (this.values.length == 0 || !this.subject || !this.message || !this.selectRule) {
+      if (
+        this.values.length == 0 ||
+        !this.subject ||
+        !this.message ||
+        !this.selectRule
+      ) {
         swal("Share error!", "Please check your input field", "error");
       } else {
         swal("Share successfully!", "Event has been shared!", "success");
