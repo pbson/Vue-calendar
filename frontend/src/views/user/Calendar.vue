@@ -251,20 +251,39 @@ export default {
       if (id == payload.owner) {
         return true;
       } else {
-        if (payload.accessRules == "607429067a1850bd9014fdf9") {
-          return true;
-        } else if (!payload.attendees) {
-          return false;
-        } else {
+        if (payload.attendees) {
           let user = payload.attendees.find((el) => el.UserId._id === id);
           if (user && user.AccessRuleId == "607428fa7a1850bd9014fdf8") {
             return false;
           } else if (user && user.AccessRuleId == "607429067a1850bd9014fdf9") {
             return true;
           }
+        }  else if (payload.accessRules == "607429067a1850bd9014fdf9") {
+          return true;
+        } else {
+          return false;
         }
       }
     },
+    // isShow: function(payload) {
+    //   const id = localStorage.getItem("id");
+    //   if (id == payload.owner) {
+    //     return true;
+    //   } else {
+    //     if (payload.accessRules == "607429067a1850bd9014fdf9") {
+    //       return true;
+    //     } else if (!payload.attendees) {
+    //       return false;
+    //     } else {
+    //       let user = payload.attendees.find((el) => el.UserId._id === id);
+    //       if (user && user.AccessRuleId == "607428fa7a1850bd9014fdf8") {
+    //         return false;
+    //       } else if (user && user.AccessRuleId == "607429067a1850bd9014fdf9") {
+    //         return true;
+    //       }
+    //     }
+    //   }
+    // },
     async getEvents() {
       try {
         await this.initInstances({

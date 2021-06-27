@@ -94,6 +94,7 @@
                     v-if="fromTimeMenu"
                     v-model="fromTime"
                     full-width
+                    :max="toTime"
                     @click:minute="$refs.fromTimeMenu.save(fromTime)"
                   ></v-time-picker>
                 </v-menu>
@@ -126,6 +127,7 @@
                   <v-time-picker
                     v-if="toTimeMenu"
                     v-model="toTime"
+                    :min="fromTime"
                     full-width
                     @click:minute="$refs.toTimeMenu.save(toTime)"
                   ></v-time-picker>

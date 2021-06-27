@@ -169,10 +169,10 @@ export default {
         console.log(error);
       }
       (this.name = ""),
-      (this.email = ""),
-      (this.password = ""),
-      (this.password_confirmation = "");
-      (this.faculty = "");
+        (this.email = ""),
+        (this.password = ""),
+        (this.password_confirmation = "");
+      this.faculty = "";
     },
     reset() {
       this.$refs.form.reset();
@@ -185,6 +185,9 @@ export default {
         method: "GET",
       });
       this.faculties = resp.data.data;
+      this.faculties = this.faculties.filter(
+        (item) => item.FacultyName != "None"
+      );
     } catch (error) {
       console.log(error);
     }

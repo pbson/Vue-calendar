@@ -25,7 +25,6 @@ function createAllEvents(events, focus) {
                 ...makeRecurringEvents(item, getFocus(focus))
             ];
         } else {
-            console.log(item)
             allEvents.push({
                 start: `${item.OnDay} ${item.StartAt}`,
                 end: `${item.OnDay} ${item.EndAt}`,

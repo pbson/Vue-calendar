@@ -35,7 +35,7 @@ const eventsSchema = new Schema({
     },
     Owner: {
         type: Schema.Types.ObjectId,
-        ref: Users,
+        ref: 'User',
         required: true
     },
     ResponseStatus: {
@@ -45,7 +45,7 @@ const eventsSchema = new Schema({
         {
             UserId: {
                 type: Schema.Types.ObjectId,
-                ref: Users,
+                ref: 'User',
             },
             AccessRuleId: {
                 type: Schema.Types.ObjectId,

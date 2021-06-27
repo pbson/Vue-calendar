@@ -12,6 +12,7 @@
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "date-fns": "^2.21.1",
+    "dns": "^0.2.2",
     "firebase": "^8.2.9",
     "ical-generator": "^1.15.4",
     "ics": "^2.27.0",
@@ -21,6 +22,8 @@
     "material-design-icons-iconfont": "^6.1.0",
     "moment": "^2.29.1",
     "node-schedule": "^2.0.0",
+    "nodemailer": "^6.6.2",
+    "register-service-worker": "^1.7.2",
     "rrule": "^2.6.8",
     "sweetalert": "^2.1.2",
     "vue": "^2.6.12",
@@ -31,6 +34,7 @@
     "vuex": "^3.6.2"
   },
   "devDependencies": {
+    "@types/nodemailer": "^6.4.2",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-service": "~4.5.0",

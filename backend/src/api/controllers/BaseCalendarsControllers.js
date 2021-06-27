@@ -46,7 +46,6 @@ export default {
             calendar = calendar.filter(function (item) {
                 return item.Owner.Faculty == req.query.faculty && item.Owner.Role == '6071f3fc465293cd03744986';
             });
-            console.log(calendar)
             return res
                 .status(200)
                 .json({
@@ -277,7 +276,6 @@ export default {
                     let result = await BaseCalendar.find({ '_id': { "$nin": calendarList }, $text: { $search: req.body.calendar }, Owner: { "$ne": req.user._id }, isHidden: false })
                         .skip(new Number(req.query.index))
                         .limit(new Number(req.query.count))
-                        // .populate('Owner', 'Name Role Faculty')
                         .populate({
                             path: 'Owner',
                             populate: {
@@ -287,6 +285,7 @@ export default {
                             select: 'Name Role'
                         })
                         .populate('AccessRuleId', 'AccessName')
+
                     return res
                         .status(200)
                         .json({
@@ -315,7 +314,6 @@ export default {
                         },
                         select: 'Name Role'
                     }).populate('AccessRuleId', 'AccessName')
-                console.log(result)
 
                 return res
                     .status(200)

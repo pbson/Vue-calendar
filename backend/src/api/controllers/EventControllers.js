@@ -62,7 +62,6 @@ export default {
                 // item.AccessRuleId = accessRules[j]
                 j++;
             })
-            console.log(mergedArr)
 
             if (eventList) {
                 return res
@@ -278,10 +277,8 @@ export default {
                 try {
                     for (let item of user.CalendarLists) {
                         let calEntries = await CalendarEntries.findById(item)
-                        console.log(calEntries)
                         if (calEntries.isPrimary == true) {
                             let cal = await BaseCalendar.findById(calEntries.CalendarId)
-                            console.log(cal)
                             cal.Events.push(req.query.eventId);
                             cal.save();
                             break;

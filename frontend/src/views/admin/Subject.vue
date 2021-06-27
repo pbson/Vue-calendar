@@ -168,7 +168,7 @@ export default {
       items: [
         { title: "User", icon: "mdi-home", link: "/admin/user" },
         { title: "Subject", icon: "mdi-format-size", link: "/admin/subject" },
-        { title: "Faculty", icon: "mdi-grid-large", link: "/admin/faculty" },
+        { title: "School", icon: "mdi-grid-large", link: "/admin/faculty" },
       ],
     };
   },
@@ -211,6 +211,9 @@ export default {
           },
         });
         this.faculties = resp.data.data;
+        this.faculties = this.faculties.filter(
+          (item) => item.FacultyName != "None"
+        );
       } catch (error) {
         console.log(error);
       }

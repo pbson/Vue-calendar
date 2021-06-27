@@ -14,9 +14,30 @@
           Select one to create
         </h2>
         <v-tabs class="mb-5" fixed-tabs color=" darken-1">
-          <v-tab @click="type = 'event'; resetField()"> Event </v-tab>
-          <v-tab @click="type = 'reminder'; resetField()"> Reminder </v-tab>
-          <v-tab @click="type = 'task'; resetField()"> Task </v-tab>
+          <v-tab
+            @click="
+              type = 'event';
+              resetField();
+            "
+          >
+            Event
+          </v-tab>
+          <v-tab
+            @click="
+              type = 'reminder';
+              resetField();
+            "
+          >
+            Reminder
+          </v-tab>
+          <v-tab
+            @click="
+              type = 'task';
+              resetField();
+            "
+          >
+            Task
+          </v-tab>
         </v-tabs>
         <v-card-text>
           <v-container>
@@ -101,17 +122,14 @@
                   <v-time-picker
                     v-if="fromTimeMenu"
                     v-model="fromTime"
+                    :max="toTime"
                     full-width
                     @click:minute="$refs.fromTimeMenu.save(fromTime)"
                   ></v-time-picker>
                 </v-menu>
               </v-col>
               <!-- Event end time -->
-              <v-col
-                cols="12"
-                sm="4"
-                v-if="type == 'event' && fromTime"
-              >
+              <v-col cols="12" sm="4" v-if="type == 'event' && fromTime">
                 <v-menu
                   ref="toTimeMenu"
                   v-model="toTimeMenu"
@@ -138,6 +156,7 @@
                   <v-time-picker
                     v-if="toTimeMenu"
                     v-model="toTime"
+                    :min="fromTime"
                     full-width
                     @click:minute="$refs.toTimeMenu.save(toTime)"
                   ></v-time-picker>
@@ -361,7 +380,7 @@ export default {
           endAt: this.toTime,
           onDay: this.fromDate,
           isRecurring: this.isRecurring,
-          responseStatus: 'GOING',
+          responseStatus: "GOING",
           calendarId: this.selectCalendar.id,
           colorId: this.selectCalendar.color,
           minute: this.minute,
@@ -387,7 +406,9 @@ export default {
           type: "reminder",
         });
       } else if (this.type == "task") {
-        let calendar = this.calendarList.find((elem) => elem.name == "Task" && elem.isPrimary == true);
+        let calendar = this.calendarList.find(
+          (elem) => elem.name == "Task" && elem.isPrimary == true
+        );
         this.sendAddEventApi({
           title: this.title,
           description: this.description,

@@ -50,7 +50,6 @@ export default {
   registerMinistry: async (req, res) => {
     const { name, email, password, faculty } = req.body;
 
-    console.log(req.body)
     //VALIDATE
     const { error } = registerValidation(req.body);
     if (error) {
@@ -79,7 +78,6 @@ export default {
       const savedUser = await user.save();
       //Create and sign Token
       const token = jwt.sign({ _id: savedUser._id }, process.env.jwtSecret, { expiresIn: 86400 });
-      console.log(savedUser)
       //Create Activities Calendar
       let result = await BaseCalendar.find({ CalendarTitle: 'Activities Calendar' })
         .populate('Owner', 'Name Faculty Role')
@@ -358,10 +356,6 @@ export default {
   },
   sendInvitation: async function (req, res) {
     try {
-      //GET INFO
-      let sender = await User.findById(req.user._id);
-      let event = await Event.findById(req.body.eventId);
-
       // create reusable transporter object using the default SMTP transport
       let transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
@@ -372,6 +366,21 @@ export default {
           pass: 'NtldtntSC',
         },
       });
+      
+      if (req.query.toTeacher){
+        await transporter.sendMail({
+          from: req.body.from, // sender address
+          to: req.body.to, // list of receivers
+          subject: req.body.subject, // Subject line
+          text: req.body.text, // plain text body
+        });
+        return res
+        .status(200)  
+      }
+      //GET INFO
+      let sender = await User.findById(req.user._id);
+      let event = await Event.findById(req.body.eventId);
+
       await Promise.all(
         req.body.users.map(async (item) => {
           let email = await User.findById(item).select('Email')
@@ -616,7 +625,7 @@ export default {
                                                         "
                                                       >
                                                         You have receive a event invitation from
-                                                        ${sender.Name}. The details is down below. You could choose to accept or deny the event
+                                                        ${sender.Name}. ${req.body.message}
                                                       </div>
                                                     </td>
                                                   </tr>

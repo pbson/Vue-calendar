@@ -87,6 +87,9 @@ export default {
         method: "GET",
       });
       this.faculties = resp.data.data;
+      this.faculties = this.faculties.filter(
+        (item) => item.FacultyName != "None"
+      );
       this.getUser();
     } catch (error) {
       console.log(error);
@@ -116,12 +119,11 @@ export default {
           email: this.email,
           faculty: this.selectFaculty,
         };
-        let resp = await axios({
+        await axios({
           url: `http://localhost:3000/auth/update?id=${id}`,
           data: data,
           method: "PUT",
         });
-        console.log(resp.status)
         swal("Update successfully!", "User information updated", "success");
       } catch (error) {
         swal("Update error!", "User information not updated", "error");

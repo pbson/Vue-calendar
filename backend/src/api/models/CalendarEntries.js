@@ -26,6 +26,5 @@ const calendarEntriesSchema = new Schema({
 })
 
 calendarEntriesSchema.plugin(timestamps);
-calendarEntriesSchema.pre('updateOne', { document: true, query: false },function(){ console.log('Hello from pre delete')});
 
 export default model('CalendarEntries', calendarEntriesSchema)

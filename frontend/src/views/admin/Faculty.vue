@@ -178,10 +178,11 @@ export default {
     async initialize() {
       try {
         let resp = await axios({
-          url: "http://localhost:3000/faculty/getall?page=1&limit=10",
+          url: "http://localhost:3000/faculty/getall",
           method: "GET",
         });
         this.faculties = resp.data.data;
+        this.faculties = this.faculties.filter(item=>item.FacultyName != 'None')
       } catch (error) {
         console.log(error);
       }

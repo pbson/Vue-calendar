@@ -90,16 +90,6 @@
                             required
                           ></v-select>
                         </v-col>
-                        <v-col cols="6" sm="6">
-                          <v-select
-                            :items="faculties"
-                            item-text="FacultyName"
-                            v-model="selectFaculty"
-                            item-value="_id"
-                            label="Faculties*"
-                            required
-                          ></v-select>
-                        </v-col>
                       </v-row>
                     </v-container>
                   </v-card-text>
@@ -135,10 +125,24 @@
             </v-toolbar>
           </template>
           <template v-slot:item.actions="{ item }">
-            <v-icon small class="mr-2" @click="editItem(item)">
+            <v-icon
+              v-if="
+                item.Role.RoleName != 'admin' &&
+                  item.Role.RoleName != 'ministry'
+              "
+              small
+              class="mr-2"
+              @click="editItem(item)"
+            >
               mdi-pencil
             </v-icon>
-            <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+            <v-icon
+              v-if="item.Role.RoleName != 'admin'"
+              small
+              @click="deleteItem(item)"
+            >
+              mdi-delete
+            </v-icon>
           </template>
           <template v-slot:no-data>
             <v-btn color="primary" @click="initialize"> Reset </v-btn>
@@ -181,7 +185,7 @@ export default {
       items: [
         { title: "User", icon: "mdi-home", link: "/admin/user" },
         { title: "Subject", icon: "mdi-format-size", link: "/admin/subject" },
-        { title: "Faculty", icon: "mdi-grid-large", link: "/admin/faculty" },
+        { title: "School", icon: "mdi-grid-large", link: "/admin/faculty" },
       ],
     };
   },
@@ -240,6 +244,9 @@ export default {
           },
         });
         this.faculties = resp.data.data;
+        this.faculties = this.faculties.filter(
+          (item) => item.FacultyName != "None"
+        );
       } catch (error) {
         console.log(error);
       }
@@ -287,7 +294,6 @@ export default {
         const token = localStorage.getItem("token");
         let user = {
           role: this.selectRole,
-          faculty: this.selectFaculty,
         };
         await axios({
           url: `http://localhost:3000/auth/update?id=${this.editedItem._id}`,
@@ -300,11 +306,10 @@ export default {
       } catch (error) {
         console.log(error);
       }
-      this.email = '',
-      this.name = '',
-      this.selectRole = '',
-      this.selectFaculty = ''
-      this.initialize();
+      (this.email = ""),
+        (this.name = ""),
+        (this.selectRole = ""),
+        this.initialize();
       this.close();
     },
   },

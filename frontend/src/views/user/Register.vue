@@ -241,6 +241,9 @@ export default {
         method: "GET",
       });
       this.faculties = resp.data.data;
+      this.faculties = this.faculties.filter(
+        (item) => item.FacultyName != "None"
+      );
     } catch (error) {
       console.log(error);
     }

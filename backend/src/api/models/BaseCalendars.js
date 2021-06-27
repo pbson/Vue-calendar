@@ -8,7 +8,7 @@ import CalendarEntries from './CalendarEntries'
 const baseCalendarsSchema = new Schema({
     Owner: {
         type: Schema.Types.ObjectId,
-        ref: Users
+        ref: 'User'
     },
     CalendarTitle: {
         type: String,
@@ -46,7 +46,6 @@ baseCalendarsSchema.pre('save', { document: true, query: false },async function(
         }
     }
 });
-
 baseCalendarsSchema.index({'CalendarTitle': 'text'});
 
 export default model('BaseCalendars', baseCalendarsSchema)

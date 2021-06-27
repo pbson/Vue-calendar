@@ -81,15 +81,23 @@
                       <!-- Select teacher -->
                       <v-col cols="6" sm="6">
                         <v-select
+                          return-object
                           :items="teacherList"
                           item-text="Name"
                           v-model="selectTeacher"
-                          item-value="Name"
                           label="Teacher*"
                           required
                         ></v-select>
                       </v-col>
                     </v-row>
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="classCode"
+                        prepend-icon="mdi-square-edit-outline"
+                        label="Class Code*"
+                        required
+                      ></v-text-field>
+                    </v-col>
                     <!-- Event description -->
                     <v-col cols="12">
                       <v-textarea
@@ -159,6 +167,7 @@
                           <v-time-picker
                             v-if="fromTimeMenu"
                             v-model="fromTime"
+                            :max="toTime"
                             full-width
                             @click:minute="$refs.fromTimeMenu.save(fromTime)"
                           ></v-time-picker>
@@ -192,6 +201,7 @@
                           <v-time-picker
                             v-if="toTimeMenu"
                             v-model="toTime"
+                            :min="fromTime"
                             full-width
                             @click:minute="$refs.toTimeMenu.save(toTime)"
                           ></v-time-picker>
@@ -286,7 +296,6 @@
 <script>
 import axios from "axios";
 import { RRule, RRuleSet } from "rrule";
-
 export default {
   name: "ministryCalendarManagement",
   data() {
@@ -317,6 +326,7 @@ export default {
 
       title: "",
       description: "",
+      classCode: "",
 
       fromDateMenu: false,
       fromDate: null,
@@ -513,18 +523,34 @@ export default {
         console.log(error);
       }
     },
+    sendEmailApi: async function(item) {
+      try {
+        const token = localStorage.getItem("token");
+        let resp = await axios({
+          url: "http://localhost:3000/auth/invite?toTeacher=1",
+          data: item,
+          method: "POST",
+          headers: {
+            "auth-token": token,
+          },
+        });
+        return resp.data.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
 
     save: async function() {
       let calendar = await this.sendAddCalendarApi({
-        title: `${this.selectSubject} - ${this.selectTeacher}`,
-        description: `${this.selectSubject} - ${this.selectTeacher} - ${this.description}`,
+        title: `${this.selectSubject} - ${this.selectTeacher.Name} - ${this.classCode}`,
+        description: `${this.selectSubject} - ${this.classCode} - ${this.selectTeacher.Name} - ${this.description}`,
         events: [],
         isHidden: false,
         accessRuleId: "607429737a1850bd9014fdfa",
       });
       this.sendAddEventApi({
-        title: `${this.selectSubject} - ${this.selectTeacher}`,
-        description: `${this.selectSubject} - ${this.selectTeacher} - ${this.description}`,
+        title: `${this.selectSubject} - ${this.selectTeacher.Name} - ${this.classCode}`,
+        description: `${this.selectSubject} - ${this.selectTeacher.Name} - ${this.description} - ${this.classCode}`,
         startAt: this.fromTime,
         endAt: this.toTime,
         onDay: this.fromDate,
@@ -540,6 +566,13 @@ export default {
         this.isAddItem = false;
         this.close();
       }, 200);
+      // send email to teacher
+      this.sendEmailApi({
+        from: `ministry@gmail.com`,
+        to: this.selectTeacher.Email,
+        subject: 'New teaching calendar created',
+        text: `Your class ${this.selectSubject} - ${this.selectTeacher.Name} - ${this.classCode} has been created, please look it up`, 
+      });
       this.selectSubject = "";
       this.selectTeacher = "";
       this.fromTime = null;
