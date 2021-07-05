@@ -38,6 +38,7 @@ const actions = {
                 .then(resp => {
                     const token = resp.data.token
                     const user = resp.data.user
+                    window.$cookies.set("token", token, "86400")
                     localStorage.setItem('token', token)
                     localStorage.setItem('id', user._id)
                     localStorage.setItem('role', user.Role)
@@ -60,6 +61,7 @@ const actions = {
             let resp = await axios({ url: 'http://localhost:3000/auth/register', data: user, method: 'POST' });
             const token = resp.data.token
             const respUser = resp.data.user
+            window.$cookies.set("token", token, "86400")
             localStorage.setItem('token', token)
             localStorage.setItem('id', respUser._id)
             localStorage.setItem('role', respUser.Role)
@@ -80,6 +82,7 @@ const actions = {
             let resp = await axios({ url: 'http://localhost:3000/auth/registerministry', data: user, method: 'POST' });
             const token = resp.data.token
             const respUser = resp.data.user
+            window.$cookies.set("token", token, "86400")
             localStorage.setItem('token', token)
             localStorage.setItem('id', respUser._id)
             localStorage.setItem('role', respUser.Role)
@@ -97,6 +100,7 @@ const actions = {
     logout({ commit }) {
         return new Promise((resolve) => {
             commit('logout')
+            window.$cookies.remove("token")
             localStorage.removeItem('token')
             localStorage.removeItem('role')
             localStorage.removeItem('id')

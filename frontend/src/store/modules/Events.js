@@ -51,6 +51,7 @@ function createAllEvents(events, focus) {
 }
 
 function makeRecurringEvents(payload, focus) {
+    console.log(payload)
     let recurringEvents = [];
     let year = parseISO(focus).getFullYear();
     let monthUTC = new Date(focus).getUTCMonth();

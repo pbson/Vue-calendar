@@ -125,16 +125,6 @@ export default {
                         });
                     });
                 }
-                // res.attachment('calendar.ics')
-                // res.type('ics')
-                // return res.send(value)
-
-                // return res
-                //     .status(200)
-                //     .json({
-                //         status: 'OK',
-                //         data: value
-                //     })
             });
         } catch (error) {
             console.log(error)

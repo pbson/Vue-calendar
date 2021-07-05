@@ -34,6 +34,7 @@ const baseCalendarsSchema = new Schema({
 baseCalendarsSchema.plugin(timestamps);
 baseCalendarsSchema.pre('remove', { document: true, query: false },async function(){
     await CalendarEntries.deleteMany({ CalendarId: this._id });
+    await Events.updateMany({ BaseCalendarId: this._id }, { BaseCalendarId: '60d4a81894ab933a3fd21a1d' }, { multi: true });
 });
 baseCalendarsSchema.pre('save', { document: true, query: false },async function(){
     if (this.isHidden == true){

@@ -212,6 +212,9 @@ export default {
           method: "GET",
         });
         this.users = resp.data.data;
+        this.users = this.users.filter((item) => {
+          return item.Email != "none@gmail.com";
+        });
       } catch (error) {
         console.log(error);
       }
@@ -228,6 +231,9 @@ export default {
           },
         });
         this.roles = resp.data.data;
+        this.roles = this.roles.filter((item) => {
+          return item.RoleName != "ministry" && item.RoleName != "admin";
+        });
       } catch (error) {
         console.log(error);
       }

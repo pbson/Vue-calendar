@@ -239,8 +239,8 @@ export default {
   methods: {
     ...mapActions(["addCalendarList", "initInstances"]),
     getDay(date) {
-      let i = lunar(new Date(date.date)); 
-      return `${new Date(date.date).getDate()} (${i.day}/${i.month}  )`;
+      let i = lunar(new Date(date.date));
+      return `${new Date(date.date).getDate()} (${i.day}/${i.month+2}  )`;
     },
     viewDay({ date }) {
       this.focus = date;
@@ -251,14 +251,14 @@ export default {
       if (id == payload.owner) {
         return true;
       } else {
-        if (payload.attendees) {
+        if (payload.attendees && payload.attendees.length>0) {
           let user = payload.attendees.find((el) => el.UserId._id === id);
           if (user && user.AccessRuleId == "607428fa7a1850bd9014fdf8") {
             return false;
           } else if (user && user.AccessRuleId == "607429067a1850bd9014fdf9") {
             return true;
           }
-        }  else if (payload.accessRules == "607429067a1850bd9014fdf9") {
+        } else if (payload.accessRules == "607429067a1850bd9014fdf9") {
           return true;
         } else {
           return false;
@@ -356,6 +356,11 @@ export default {
           .subtract(item.reminder, "minutes")
           .toDate();
         await schedule.scheduleJob(reminderTime, function() {
+          // navigator.serviceWorker.ready.then(function(swreg) {
+          //   swreg.showNotification(item.name, {
+          //     body: `${item.start} to ${item.end}`,
+          //   });
+          // });
           new Notification(item.name, {
             body: `${item.start} to ${item.end}`,
             sound: "../assets/noti.mp3",

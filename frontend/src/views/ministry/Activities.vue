@@ -356,6 +356,7 @@ export default {
         });
         this.calendar = resp.data.data;
         this.events = resp.data.data.Events;
+        console.log(resp)
       } catch (error) {
         console.log(error);
       }

@@ -75,55 +75,6 @@ export default {
     exportCalendar: async function(id) {
       try {
         window.open(`http://localhost:3000/base-calendar/generate-ics?id=${id}`);
-
-        // await axios({
-        //   url: `http://localhost:3000/base-calendar/get-events?id=${id}`,
-        //   method: "GET",
-        //   headers: {
-        //     "auth-token": token,
-        //   },
-        // });
-        // let events = resp.data.data.Events.map((item) => {
-        //   let resp = {
-        //     start: [
-        //       ...item.OnDay.split("-").map(Number),
-        //       ...item.StartAt.split(":").map(Number),
-        //     ],
-        //     end: [
-        //       ...item.OnDay.split("-").map(Number),
-        //       ...item.EndAt.split(":").map(Number),
-        //     ],
-        //     title: item.EventTitle,
-        //     description: item.EventDescription,
-        //   };
-        //   if (item.RecurrencePattern) {
-        //     resp.recurrenceRule = item.RecurrencePattern;
-        //   }
-        //   if (item.Attendees) {
-        //     resp.attendees = item.Attendees.map((item) => {
-        //       return {
-        //         name: item.UserId.Name,
-        //         email: item.UserId.Email,
-        //         partstat: "ACCEPTED",
-        //       };
-        //     });
-        //   }
-        //   return resp;
-        // });
-        // ics.createEvents(events, (error, value) => {
-        //   if (error) {
-        //     console.log(error);
-        //     return;
-        //   }
-        //   console.log(value);
-        // });
-
-        // let icsArr = resp.data.data.Events.map(item=>{
-        //   return {
-
-        //   }
-        // })
-        // return resp
       } catch (error) {
         console.log(error);
       }
